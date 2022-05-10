@@ -1,0 +1,42 @@
+name: Build Only
+
+on:
+  push:
+
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Artifacts
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build --stacktrace
+
+      - name: Extract Current Branch name
+        shell: bash
+
+        # bash pattern expansion to grab branch name without slashes
+        run: ref="${GITHUB_REF#refs/heads/}" && echo "::set-output name=branch::${ref////-}"
+        id: ref
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+
+        with:
+          name: build-artifacts-${{ steps.ref.outputs.branch }}
+          path: build/libs/*[0-9].jar
