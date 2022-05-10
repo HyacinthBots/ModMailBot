@@ -5,6 +5,7 @@ package io.github.nocomment1105.modmailbot
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import io.github.nocomment1105.modmailbot.DatabaseManager.startDatabase
 import io.github.nocomment1105.modmailbot.extensions.MainExtension
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -39,6 +40,12 @@ suspend fun main() {
 				"playing" -> playing(config.getProperty("status"))
 				"watching" -> watching(config.getProperty("status"))
 				else -> watching("for your DMs!")
+			}
+		}
+
+		hooks {
+			afterKoinSetup {
+				startDatabase()
 			}
 		}
 	}

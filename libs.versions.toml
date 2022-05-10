@@ -1,16 +1,38 @@
 [versions]
-detekt = "1.20.0"  # Note: Plugin versions must be updated in the settings.gradle.kts too
-kotlin = "1.6.10"  # Note: Plugin versions must be updated in the settings.gradle.kts too
-
-groovy = "3.0.9"
+# Base
 kord-extensions = "1.5.3-20220422.152027-6"
+kotlin = "1.6.10"  # Note: Plugin versions must be updated in the settings.gradle.kts too
+# ---
+# Logging
+groovy = "3.0.9"
 logging = "2.1.21"
 logback = "1.2.8"
+# ---
+# Formatting
+detekt = "1.20.0"  # Note: Plugin versions must be updated in the settings.gradle.kts too
+# ---
+# Database
+exposed = "0.38.2"
+sqlite = "3.36.0.3"
+hikari = "5.0.1"
 
 [libraries]
-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
-groovy = { module = "org.codehaus.groovy:groovy", version.ref = "groovy" }
+# Base
 kord-extensions = { module = "com.kotlindiscord.kord.extensions:kord-extensions", version.ref = "kord-extensions" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
+# ---
+# Logging
+groovy = { module = "org.codehaus.groovy:groovy", version.ref = "groovy" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 logging = { module = "io.github.microutils:kotlin-logging", version.ref = "logging" }
+# ---
+# Formatting
+detekt = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+# ---
+# Database
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed"}
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite"}
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+
