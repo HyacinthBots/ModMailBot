@@ -1,9 +1,11 @@
-package io.github.nocomment1105.modmailbot
+package io.github.nocomment1105.modmailbot.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.DriverManager
 
@@ -26,11 +28,18 @@ object DatabaseManager {
 		logger.info("Connected to database")
 	}
 
+	object OpenThreads : Table("openThreads") {
+		val userId = text("userId")
+		val threadId = text("threadId")
+
+		override val primaryKey = PrimaryKey(userId)
+	}
+
 	fun startDatabase() {
 		DriverManager.getConnection(URL)
 
 		transaction {
-			// SchemaUtils.createMissingTablesAndColumns()
+			SchemaUtils.createMissingTablesAndColumns(OpenThreads)
 		}
 	}
 }

@@ -5,8 +5,8 @@ package io.github.nocomment1105.modmailbot
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
-import io.github.nocomment1105.modmailbot.DatabaseManager.startDatabase
-import io.github.nocomment1105.modmailbot.extensions.MainExtension
+import io.github.nocomment1105.modmailbot.database.DatabaseManager.startDatabase
+import io.github.nocomment1105.modmailbot.extensions.MessageSending
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
@@ -22,7 +22,7 @@ suspend fun main() {
 
 	val bot = ExtensibleBot(config.getProperty("bot_token")) {
 		extensions {
-			add(::MainExtension)
+			add(::MessageSending)
 		}
 
 		intents {
