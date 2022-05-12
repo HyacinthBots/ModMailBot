@@ -63,7 +63,7 @@ complexity:
     active: true
   StringLiteralDuplication:
     active: true
-    threshold: 6 # TODO Change this down to 3 once all other PR's are merged
+    threshold: 4
     ignoreAnnotation: true
     excludeStringsWithLessThan5Characters: true
     ignoreStringsRegex: '$^'
@@ -173,8 +173,6 @@ formatting:
   NoEmptyFirstLineInMethodBlock:
     active: true
     autoCorrect: true
-  NoWildcardImports: # TODO Remove once log uploading PR is merged
-    active: false
   PackageName:
     active: true
     autoCorrect: true
@@ -369,5 +367,3 @@ style:
     active: true
   UseRequireNotNull:
     active: true
-  WildcardImport: # TODO Remove this once log uploading PR is merged
-    active: false

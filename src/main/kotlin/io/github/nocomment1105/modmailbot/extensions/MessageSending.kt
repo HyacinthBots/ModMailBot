@@ -12,6 +12,7 @@ import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.createTextChannel
 import dev.kord.core.behavior.getChannelOf
+import dev.kord.core.entity.ReactionEmoji
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.create.embed
@@ -40,10 +41,6 @@ class MessageSending : Extension() {
 				failIf(event.message.author!!.id == kord.selfId)
 			}
 			action {
-				/*
-				TODO Implement a check to see if the user already has an open channel, if they do, direct the message
-				 toward that instead.
-				 */
 				var openThread = false
 				newSuspendedTransaction {
 					openThread = try {
@@ -85,6 +82,7 @@ class MessageSending : Extension() {
 								).nickname.toString()
 								inline = true
 							}
+
 							field {
 								val roles = event.message.author!!.asMember(
 									Snowflake(config.getProperty("main_server_id"))
@@ -107,11 +105,16 @@ class MessageSending : Extension() {
 							}
 						}
 
+						// Send the message through to the mail server
 						messageEmbed(event.message)
 					}
+
+					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
+					event.message.addReaction(ReactionEmoji.Unicode("\u2705"))
 				} else {
 					val mailChannelId: String
 
+					// Attempt to find threads open in the users id. If this failed something has gone horribly wrong
 					try {
 						mailChannelId = getOpenThreadsForUser(event.message.author!!.id, DatabaseManager.OpenThreads.threadId)
 					} catch (e: NoSuchElementException) {
@@ -119,13 +122,18 @@ class MessageSending : Extension() {
 						return@action
 					}
 
+					// Get the mail server from the config file
 					mailChannel = kord.getGuild(
 						Snowflake(config.getProperty("mail_server_id"))
 					)!!.getChannelOf(Snowflake(mailChannelId))
 
+					// Send the user's message through to the mail server
 					mailChannel.createMessage {
 						messageEmbed(event.message)
 					}
+
+					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
+					event.message.addReaction(ReactionEmoji.Unicode("\u2705"))
 				}
 			}
 		}

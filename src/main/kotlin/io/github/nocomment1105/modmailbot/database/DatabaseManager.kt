@@ -8,14 +8,22 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.DriverManager
+import kotlin.io.path.Path
+import kotlin.io.path.createDirectory
+import kotlin.io.path.exists
 
 private const val URL = "jdbc:sqlite:./data/database.db"
+private val dbDirectory = Path("./data")
 object DatabaseManager {
 	private val logger = KotlinLogging.logger("Database Manager")
 	private val config = HikariConfig()
 	private var dataSource: HikariDataSource
 
 	init {
+		if (!dbDirectory.exists()) {
+			logger.info("./data directory not found - creating!")
+			dbDirectory.createDirectory()
+		}
 		config.jdbcUrl = URL
 		config.connectionTestQuery = "SELECT 1"
 		config.addDataSourceProperty("cachePrepStmts", true)
