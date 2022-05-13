@@ -112,7 +112,9 @@ class MessageSending : Extension() {
 						}
 
 						// Send the message through to the mail server
-						messageEmbed(event.message)
+						embed {
+							messageEmbed(event.message)
+						}
 					}
 
 					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
@@ -135,7 +137,9 @@ class MessageSending : Extension() {
 
 					// Send the user's message through to the mail server
 					mailChannel.createMessage {
-						messageEmbed(event.message)
+						embed {
+							messageEmbed(event.message)
+						}
 					}
 
 					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
