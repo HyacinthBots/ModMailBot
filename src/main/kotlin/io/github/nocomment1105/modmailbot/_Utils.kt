@@ -7,7 +7,7 @@ import dev.kord.rest.builder.message.create.embed
 import kotlinx.datetime.Clock
 
 /**
- * Creates an embed in a [UserMessageCreateBuilder] containing a message received from DM or sent from inbox guild.
+ * Creates an embed in a [UserMessageCreateBuilder] containing a message received from DM or sent from the mail guild.
  *
  * @param message The contents of the message to send
  * @author NoComment1105

@@ -26,6 +26,7 @@ repositories {
 dependencies {
     implementation(libs.kord.extensions)
     implementation(libs.kotlin.stdlib)
+    implementation(libs.kordx.emoji)
 
     // Logging dependencies
     implementation(libs.groovy)

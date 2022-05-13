@@ -12,10 +12,11 @@ import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.createTextChannel
 import dev.kord.core.behavior.getChannelOf
-import dev.kord.core.entity.ReactionEmoji
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.create.embed
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.addReaction
 import io.github.nocomment1105.modmailbot.config
 import io.github.nocomment1105.modmailbot.database.DatabaseManager
 import io.github.nocomment1105.modmailbot.database.getOpenThreadsForUser
@@ -42,6 +43,7 @@ class MessageSending : Extension() {
 			}
 			action {
 				var openThread = false
+				// Check to see if the user has any threads open already
 				newSuspendedTransaction {
 					openThread = try {
 						DatabaseManager.OpenThreads.select {
@@ -57,9 +59,12 @@ class MessageSending : Extension() {
 				val mailChannel: TextChannel
 
 				if (!openThread) {
+					// Get the mail channel
 					mailChannel = kord.getGuild(
 						Snowflake(config.getProperty("mail_server_id"))
 					)!!.createTextChannel(event.message.author!!.tag)
+
+					// Store the users thread in the database
 					newSuspendedTransaction {
 						DatabaseManager.OpenThreads.insertIgnore {
 							it[userId] = event.message.author?.id.toString()
@@ -69,6 +74,7 @@ class MessageSending : Extension() {
 
 					mailChannel.createMessage {
 						content = "@here" // TODO Implement a config options system
+						// Provide some information about the user in an initial embed
 						embed {
 							description = "${event.message.author!!.mention} was created " +
 									event.message.author!!.fetchUser().createdAt.toDiscord(TimestampType.LongDateTime)
@@ -110,7 +116,7 @@ class MessageSending : Extension() {
 					}
 
 					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
-					event.message.addReaction(ReactionEmoji.Unicode("\u2705"))
+					event.message.addReaction(Emojis.whiteCheckMark)
 				} else {
 					val mailChannelId: String
 
@@ -133,7 +139,7 @@ class MessageSending : Extension() {
 					}
 
 					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
-					event.message.addReaction(ReactionEmoji.Unicode("\u2705"))
+					event.message.addReaction(Emojis.whiteCheckMark)
 				}
 			}
 		}
