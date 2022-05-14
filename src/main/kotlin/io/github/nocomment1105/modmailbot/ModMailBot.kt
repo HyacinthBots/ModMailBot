@@ -21,6 +21,10 @@ suspend fun main() {
 	}
 
 	val bot = ExtensibleBot(config.getProperty("bot_token")) {
+		applicationCommands {
+			defaultGuild(config.getProperty("mail_server_id"))
+		}
+
 		extensions {
 			add(::MessageSending)
 		}

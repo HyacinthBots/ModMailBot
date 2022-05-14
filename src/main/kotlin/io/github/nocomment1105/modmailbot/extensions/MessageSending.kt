@@ -1,12 +1,17 @@
 package io.github.nocomment1105.modmailbot.extensions
 
 import com.kotlindiscord.kord.extensions.DISCORD_BLURPLE
+import com.kotlindiscord.kord.extensions.DISCORD_GREEN
 import com.kotlindiscord.kord.extensions.checks.inGuild
 import com.kotlindiscord.kord.extensions.checks.noGuild
+import com.kotlindiscord.kord.extensions.commands.Arguments
+import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.Extension
+import com.kotlindiscord.kord.extensions.extensions.ephemeralSlashCommand
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.time.TimestampType
 import com.kotlindiscord.kord.extensions.time.toDiscord
+import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.createdAt
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
@@ -19,6 +24,7 @@ import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import io.github.nocomment1105.modmailbot.config
 import io.github.nocomment1105.modmailbot.database.DatabaseManager
+import io.github.nocomment1105.modmailbot.database.getDmFromThreadChannel
 import io.github.nocomment1105.modmailbot.database.getOpenThreadsForUser
 import io.github.nocomment1105.modmailbot.messageEmbed
 import kotlinx.coroutines.flow.toList
@@ -39,7 +45,7 @@ class MessageSending : Extension() {
 		event<MessageCreateEvent> {
 			check {
 				noGuild()
-				failIf(event.message.author!!.id == kord.selfId)
+				failIf(event.message.author?.id == kord.selfId || event.message.author == null)
 			}
 			action {
 				var openThread = false
@@ -124,7 +130,8 @@ class MessageSending : Extension() {
 
 					// Attempt to find threads open in the users id. If this failed something has gone horribly wrong
 					try {
-						mailChannelId = getOpenThreadsForUser(event.message.author!!.id, DatabaseManager.OpenThreads.threadId)
+						mailChannelId =
+							getOpenThreadsForUser(event.message.author!!.id, DatabaseManager.OpenThreads.threadId)
 					} catch (e: NoSuchElementException) {
 						logger.error("User passed checks yet has no data? What?")
 						return@action
@@ -148,15 +155,54 @@ class MessageSending : Extension() {
 			}
 		}
 
-		event<MessageCreateEvent> {
+		ephemeralSlashCommand(::ReplyArgs) {
+			name = "reply"
+			description = "Reply to the user this thread channel is owned by"
+
 			check {
 				inGuild(Snowflake(config.getProperty("mail_server_id")))
 			}
 			action {
-				/*
-				TODO Use a database when creating channels in the inbox server, allowing me to grab the user Id from
-				 from the previous message create event.
-				 */
+				var userToDm: String? = null
+				newSuspendedTransaction {
+					userToDm = try {
+						getDmFromThreadChannel(channel.id, DatabaseManager.OpenThreads.userId)
+					} catch (e: NoSuchElementException) {
+						respond {
+							content = "**Error**: This channel does not belong to a user! Use this command in user " +
+									"channels only"
+						}
+						null
+					}
+				}
+				if (userToDm == null) return@action
+
+				val dmChannel = this@ephemeralSlashCommand.kord.getUser(Snowflake(userToDm!!))!!.getDmChannel()
+
+				dmChannel.createMessage {
+					embed {
+						messageEmbed(arguments.content, user.asUser(), guild!!.id, DISCORD_GREEN)
+					}
+				}
+
+				channel.createMessage {
+					embed {
+						messageEmbed(arguments.content, user.asUser(), guild!!.id, DISCORD_GREEN)
+					}
+				}
+
+				respond { content = "Message sent" }
+			}
+		}
+	}
+
+	inner class ReplyArgs : Arguments() {
+		val content by string {
+			name = "message"
+			description = "What you'd like to reply with"
+
+			mutate {
+				it.replace("\\n", "\n").replace("\n", "\n")
 			}
 		}
 	}
