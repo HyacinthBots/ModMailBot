@@ -20,9 +20,9 @@ suspend fun main() {
 		config.load(file)
 	}
 
-	val bot = ExtensibleBot(config.getProperty("bot_token")) {
+	val bot = ExtensibleBot(BOT_TOKEN) {
 		applicationCommands {
-			defaultGuild(config.getProperty("mail_server_id"))
+			defaultGuild(MAIL_SERVER)
 		}
 
 		extensions {

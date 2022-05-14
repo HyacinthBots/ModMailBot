@@ -22,7 +22,8 @@ import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.create.embed
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
-import io.github.nocomment1105.modmailbot.config
+import io.github.nocomment1105.modmailbot.MAIL_SERVER
+import io.github.nocomment1105.modmailbot.MAIN_SERVER
 import io.github.nocomment1105.modmailbot.database.DatabaseManager
 import io.github.nocomment1105.modmailbot.database.getDmFromThreadChannel
 import io.github.nocomment1105.modmailbot.database.getOpenThreadsForUser
@@ -66,9 +67,7 @@ class MessageSending : Extension() {
 
 				if (!openThread) {
 					// Get the mail channel
-					mailChannel = kord.getGuild(
-						Snowflake(config.getProperty("mail_server_id"))
-					)!!.createTextChannel(event.message.author!!.tag)
+					mailChannel = kord.getGuild(MAIL_SERVER)!!.createTextChannel(event.message.author!!.tag)
 
 					// Store the users thread in the database
 					newSuspendedTransaction {
@@ -89,16 +88,12 @@ class MessageSending : Extension() {
 
 							field {
 								name = "Nickname"
-								value = event.message.author!!.asMember(
-									Snowflake(config.getProperty("main_server_id"))
-								).nickname.toString()
+								value = event.message.author!!.asMember(MAIN_SERVER).nickname.toString()
 								inline = true
 							}
 
 							field {
-								val roles = event.message.author!!.asMember(
-									Snowflake(config.getProperty("main_server_id"))
-								).roles.toList().map { it }
+								val roles = event.message.author!!.asMember(MAIN_SERVER).roles.toList().map { it }
 								name = "Roles"
 								roles.forEach {
 									value += "${it.name}\n"
@@ -138,9 +133,7 @@ class MessageSending : Extension() {
 					}
 
 					// Get the mail server from the config file
-					mailChannel = kord.getGuild(
-						Snowflake(config.getProperty("mail_server_id"))
-					)!!.getChannelOf(Snowflake(mailChannelId))
+					mailChannel = kord.getGuild(MAIL_SERVER)!!.getChannelOf(Snowflake(mailChannelId))
 
 					// Send the user's message through to the mail server
 					mailChannel.createMessage {
@@ -160,7 +153,7 @@ class MessageSending : Extension() {
 			description = "Reply to the user this thread channel is owned by"
 
 			check {
-				inGuild(Snowflake(config.getProperty("mail_server_id")))
+				inGuild(MAIL_SERVER)
 			}
 			action {
 				var userToDm: String? = null
