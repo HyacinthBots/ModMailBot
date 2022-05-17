@@ -6,7 +6,8 @@ import com.kotlindiscord.kord.extensions.ExtensibleBot
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import io.github.nocomment1105.modmailbot.database.DatabaseManager.startDatabase
-import io.github.nocomment1105.modmailbot.extensions.MessageSending
+import io.github.nocomment1105.modmailbot.extensions.commands.ReplyCommands
+import io.github.nocomment1105.modmailbot.extensions.events.MessageReceiving
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
@@ -26,11 +27,13 @@ suspend fun main() {
 		}
 
 		extensions {
-			add(::MessageSending)
+			add(::MessageReceiving)
+			add(::ReplyCommands)
 		}
 
 		intents {
-			+Intent.GuildMembers
+			+Intent.GuildMembers // Privileged intent
+
 			+Intent.DirectMessages
 			+Intent.GuildMessages
 			+Intent.Guilds

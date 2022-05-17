@@ -1,17 +1,11 @@
-package io.github.nocomment1105.modmailbot.extensions
+package io.github.nocomment1105.modmailbot.extensions.events
 
 import com.kotlindiscord.kord.extensions.DISCORD_BLURPLE
-import com.kotlindiscord.kord.extensions.DISCORD_GREEN
-import com.kotlindiscord.kord.extensions.checks.inGuild
 import com.kotlindiscord.kord.extensions.checks.noGuild
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.ephemeralSlashCommand
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.time.TimestampType
 import com.kotlindiscord.kord.extensions.time.toDiscord
-import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.createdAt
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
@@ -25,7 +19,6 @@ import dev.kord.x.emoji.addReaction
 import io.github.nocomment1105.modmailbot.MAIL_SERVER
 import io.github.nocomment1105.modmailbot.MAIN_SERVER
 import io.github.nocomment1105.modmailbot.database.DatabaseManager
-import io.github.nocomment1105.modmailbot.database.getDmFromThreadChannel
 import io.github.nocomment1105.modmailbot.database.getOpenThreadsForUser
 import io.github.nocomment1105.modmailbot.messageEmbed
 import kotlinx.coroutines.flow.toList
@@ -35,13 +28,12 @@ import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
-// TODO Come up with a good class name wtf
-class MessageSending : Extension() {
+class MessageReceiving : Extension() {
 
-	override val name = "main"
+	override val name = "messagereceiving"
 
 	override suspend fun setup() {
-		val logger = KotlinLogging.logger("Thread Controls")
+		val logger = KotlinLogging.logger("Message Receiving")
 
 		event<MessageCreateEvent> {
 			check {
@@ -145,57 +137,6 @@ class MessageSending : Extension() {
 					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
 					event.message.addReaction(Emojis.whiteCheckMark)
 				}
-			}
-		}
-
-		ephemeralSlashCommand(::ReplyArgs) {
-			name = "reply"
-			description = "Reply to the user this thread channel is owned by"
-
-			check {
-				inGuild(MAIL_SERVER)
-			}
-			action {
-				var userToDm: String? = null
-				newSuspendedTransaction {
-					userToDm = try {
-						getDmFromThreadChannel(channel.id, DatabaseManager.OpenThreads.userId)
-					} catch (e: NoSuchElementException) {
-						respond {
-							content = "**Error**: This channel does not belong to a user! Use this command in user " +
-									"channels only"
-						}
-						null
-					}
-				}
-				if (userToDm == null) return@action
-
-				val dmChannel = this@ephemeralSlashCommand.kord.getUser(Snowflake(userToDm!!))!!.getDmChannel()
-
-				dmChannel.createMessage {
-					embed {
-						messageEmbed(arguments.content, user.asUser(), guild!!.id, DISCORD_GREEN)
-					}
-				}
-
-				channel.createMessage {
-					embed {
-						messageEmbed(arguments.content, user.asUser(), guild!!.id, DISCORD_GREEN)
-					}
-				}
-
-				respond { content = "Message sent" }
-			}
-		}
-	}
-
-	inner class ReplyArgs : Arguments() {
-		val content by string {
-			name = "message"
-			description = "What you'd like to reply with"
-
-			mutate {
-				it.replace("\\n", "\n").replace("\n", "\n")
 			}
 		}
 	}
