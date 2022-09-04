@@ -2,7 +2,7 @@
 # Base
 kord-extensions = "1.5.5-20220831.110202-26"
 kotlin = "1.7.10"  # Note: Plugin versions must be updated in the settings.gradle.kts too
-kordx-emoji = "0.5.0"
+kordx-emoji = "master-20220904.122345-8"
 # ---
 # Logging
 logging = "2.1.23"
