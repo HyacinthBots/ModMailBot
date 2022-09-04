@@ -58,7 +58,8 @@ class ReplyCommands : Extension() {
 						SentMessageCollection().getNextMessageNumber(channel.id),
 						dmChannelMessage.id,
 						threadMessageId.id,
-						true
+						wasSentByStaff = true,
+						isAnonymous = false
 					)
 				)
 
@@ -98,7 +99,8 @@ class ReplyCommands : Extension() {
 						SentMessageCollection().getNextMessageNumber(channel.id),
 						dmChannelMessage.id,
 						threadMessageId.id,
-						true
+						wasSentByStaff = true,
+						isAnonymous = true
 					)
 				)
 

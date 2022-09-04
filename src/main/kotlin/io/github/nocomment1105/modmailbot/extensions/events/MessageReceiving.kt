@@ -117,6 +117,7 @@ class MessageReceiving : Extension() {
 							SentMessageCollection().getNextMessageNumber(mailChannel.id),
 							event.message.id,
 							mailChannelMessage.id,
+							wasSentByStaff = false,
 							false
 						)
 					)
@@ -142,7 +143,8 @@ class MessageReceiving : Extension() {
 							SentMessageCollection().getNextMessageNumber(mailChannel.id),
 							event.message.id,
 							mailChannelMessage.id,
-							false
+							false,
+							isAnonymous = false
 						)
 					)
 

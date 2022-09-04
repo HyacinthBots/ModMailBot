@@ -57,7 +57,7 @@ class OpenThreadCollection : KordExKoinComponent {
 	 * Gets the DM id from the [threadId].
 	 *
 	 * @param threadId The channel to get the DM id from
-	 * @return The data surrounding the thread
+	 * @return The user ID, also the dm channel Id
 	 * @author NoComment1105
 	 * @since 1.0.0
 	 */

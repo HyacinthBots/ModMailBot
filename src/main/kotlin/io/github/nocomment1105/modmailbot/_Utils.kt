@@ -47,26 +47,6 @@ fun EmbedBuilder.messageEmbed(message: Message) {
 	}
 }
 
-fun EmbedBuilder.editedMessageEmbed(message: Message, oldContent: String, newContent: String) {
-	author {
-		name = message.author?.tag
-		icon = message.author?.avatar?.url
-	}
-	field {
-		name = "Previous content"
-		value = oldContent
-	}
-	field {
-		name = "New content"
-		value = newContent
-	}
-	timestamp = Clock.System.now()
-	color = DISCORD_RED
-	footer {
-		text = "Message ID: ${message.id}"
-	}
-}
-
 /**
  * Creates an embed in a [EmbedBuilder] containing a message from the mail guild to send to the DM of the user who
  * owns the thread channel. If the response is anonymous, the author of the embed will be detailed as the top role
@@ -100,6 +80,38 @@ suspend fun EmbedBuilder.messageEmbed(
 	color = embedColor ?: DISCORD_RED
 	footer {
 		text = author.asMember(guildId).getTopRole()!!.name
+	}
+}
+
+/**
+ * An embed builder set up to present an old and a new message in fields for use in the edit message functions.
+ *
+ * @param message The message
+ * @param oldContent The old message content
+ * @param newContent The new message content
+ * @param embedColor An optional color to add to the embed
+ *
+ * @author NoComment1105
+ * @since 1.0.0
+ */
+fun EmbedBuilder.editedMessageEmbed(
+	message: Message,
+	oldContent: String,
+	newContent: String,
+	embedColor: Color? = null
+) {
+	field {
+		name = "Previous content"
+		value = oldContent
+	}
+	field {
+		name = "New content"
+		value = newContent
+	}
+	timestamp = Clock.System.now()
+	color = embedColor ?: DISCORD_RED
+	footer {
+		text = "Message ID: ${message.id}"
 	}
 }
 
