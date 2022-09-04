@@ -1,30 +1,27 @@
 [versions]
 # Base
-kord-extensions = "1.5.3-20220517.171319-10"
-kotlin = "1.6.10"  # Note: Plugin versions must be updated in the settings.gradle.kts too
+kord-extensions = "1.5.5-20220831.110202-26"
+kotlin = "1.7.10"  # Note: Plugin versions must be updated in the settings.gradle.kts too
 kordx-emoji = "0.5.0"
 # ---
 # Logging
-groovy = "3.0.9"
-logging = "2.1.21"
+logging = "2.1.23"
 logback = "1.2.8"
 # ---
 # Formatting
-detekt = "1.20.0"  # Note: Plugin versions must be updated in the settings.gradle.kts too
+detekt = "1.21.0"  # Note: Plugin versions must be updated in the settings.gradle.kts too
 # ---
 # Database
-exposed = "0.38.2"
-sqlite = "3.36.0.3"
-hikari = "5.0.1"
+kmongo = "4.7.0"
 
 [libraries]
 # Base
 kord-extensions = { module = "com.kotlindiscord.kord.extensions:kord-extensions", version.ref = "kord-extensions" }
+kord-extensions-unsafe = { module = "com.kotlindiscord.kord.extensions:unsafe", version.ref = "kord-extensions" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
 kordx-emoji = { module = "dev.kord.x:emoji", version.ref = "kordx-emoji"}
 # ---
 # Logging
-groovy = { module = "org.codehaus.groovy:groovy", version.ref = "groovy" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 logging = { module = "io.github.microutils:kotlin-logging", version.ref = "logging" }
 # ---
@@ -32,9 +29,5 @@ logging = { module = "io.github.microutils:kotlin-logging", version.ref = "loggi
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 # ---
 # Database
-exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed"}
-exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
-exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
-sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite"}
-hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+kmongo = { module = "org.litote.kmongo:kmongo-coroutine-serialization", version.ref = "kmongo" }
 # ---

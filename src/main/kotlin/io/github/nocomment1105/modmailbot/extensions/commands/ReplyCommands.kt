@@ -7,7 +7,6 @@ import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.ephemeralSlashCommand
 import com.kotlindiscord.kord.extensions.types.respond
-import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.rest.builder.message.create.embed
 import io.github.nocomment1105.modmailbot.MAIL_SERVER
@@ -15,8 +14,7 @@ import io.github.nocomment1105.modmailbot.inThreadChannel
 import io.github.nocomment1105.modmailbot.messageEmbed
 
 class ReplyCommands : Extension() {
-
-	override val name = "replycommands"
+	override val name = "reply-commands"
 
 	override suspend fun setup() {
 		ephemeralSlashCommand(::ReplyArgs) {
@@ -29,7 +27,7 @@ class ReplyCommands : Extension() {
 			action {
 				val userToDm = inThreadChannel() ?: return@action
 
-				val dmChannel = this@ephemeralSlashCommand.kord.getUser(Snowflake(userToDm))!!.getDmChannel()
+				val dmChannel = this@ephemeralSlashCommand.kord.getUser(userToDm)!!.getDmChannel()
 
 				dmChannel.createMessage {
 					embed {
@@ -58,7 +56,7 @@ class ReplyCommands : Extension() {
 			action {
 				val userToDm = inThreadChannel() ?: return@action
 
-				val dmChannel = this@ephemeralSlashCommand.kord.getUser(Snowflake(userToDm))!!.getDmChannel()
+				val dmChannel = this@ephemeralSlashCommand.kord.getUser(userToDm)!!.getDmChannel()
 
 				dmChannel.createMessage {
 					embed {

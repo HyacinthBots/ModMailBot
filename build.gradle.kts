@@ -21,15 +21,20 @@ repositories {
         name = "Kotlin Discord"
         url = uri("https://maven.kotlindiscord.com/repository/maven-public/")
     }
+
+    maven {
+        name = "Sonatype Snapshots"
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+    }
 }
 
 dependencies {
     implementation(libs.kord.extensions)
+    implementation(libs.kord.extensions.unsafe)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kordx.emoji)
 
     // Logging dependencies
-    implementation(libs.groovy)
     implementation(libs.logback)
     implementation(libs.logging)
 
@@ -37,17 +42,11 @@ dependencies {
     detektPlugins(libs.detekt)
 
     // Database
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.dao)
-    implementation(libs.exposed.jdbc)
-    implementation(libs.sqlite.jdbc)
-    implementation(libs.hikari)
+    implementation(libs.kmongo)
 }
 
 application {
-    // This is deprecated, but the Shadow plugin requires it
-    @Suppress("DEPRECATION")
-    mainClassName = "io.github.nocomment1105.modmailbot.ModMailBot.kt"
+    mainClass.set("io.github.nocomment1105.modmailbot.ModMailBot.kt")
 }
 
 gitHooks {
@@ -56,18 +55,26 @@ gitHooks {
     )
 }
 
-tasks.withType<KotlinCompile>().forEach {
-    it.kotlinOptions.jvmTarget = "17"
+tasks {
+    withType<KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "17"
+            languageVersion = "1.7"
+            freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
+            incremental = true
+        }
+    }
+    jar {
+        manifest {
+            attributes(
+                "Main-Class" to "io.github.nocomment1105.modmailbot.ModMailBot.kt"
+            )
+        }
+    }
 
-    it.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-    it.incremental = true
-}
-
-tasks.jar {
-    manifest {
-        attributes(
-            "Main-Class" to "io.github.nocomment1105.modmailbot.ModMailBot.kt"
-        )
+    wrapper {
+        gradleVersion = "7.5.1"
+        distributionType = Wrapper.DistributionType.BIN
     }
 }
 

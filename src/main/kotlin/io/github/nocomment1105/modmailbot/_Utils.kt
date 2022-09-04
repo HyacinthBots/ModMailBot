@@ -1,18 +1,21 @@
 package io.github.nocomment1105.modmailbot
 
 import com.kotlindiscord.kord.extensions.DISCORD_RED
+import com.kotlindiscord.kord.extensions.builders.ExtensibleBotBuilder
 import com.kotlindiscord.kord.extensions.commands.application.slash.EphemeralSlashCommandContext
-import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.getTopRole
+import com.kotlindiscord.kord.extensions.utils.loadModule
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
 import dev.kord.rest.builder.message.EmbedBuilder
-import io.github.nocomment1105.modmailbot.database.DatabaseManager
-import io.github.nocomment1105.modmailbot.database.getDmFromThreadChannel
+import io.github.nocomment1105.modmailbot.database.Database
+import io.github.nocomment1105.modmailbot.database.collections.MetaCollection
+import io.github.nocomment1105.modmailbot.database.collections.OpenThreadCollection
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.koin.dsl.bind
 
 /**
  * Creates an embed in a [EmbedBuilder] containing a message received from DM or sent from the mail guild.
@@ -48,11 +51,11 @@ fun EmbedBuilder.messageEmbed(message: Message) {
  * @since 1.0.0
  */
 suspend fun EmbedBuilder.messageEmbed(
-    message: String,
-    author: User,
-    guildId: Snowflake,
-    embedColor: Color? = null,
-    anonymous: Boolean = false
+	message: String,
+	author: User,
+	guildId: Snowflake,
+	embedColor: Color? = null,
+	anonymous: Boolean = false
 ) {
 	author {
 		if (!anonymous) {
@@ -78,22 +81,35 @@ suspend fun EmbedBuilder.messageEmbed(
  * @author NoComment1105
  * @since 1.0.0
  */
-suspend fun EphemeralSlashCommandContext<*>.inThreadChannel(): String? {
-	var userToDm: String? = null
-	newSuspendedTransaction {
-		userToDm = try {
-			getDmFromThreadChannel(channel.id, DatabaseManager.OpenThreads.userId)
-		} catch (e: NoSuchElementException) {
-			respond {
-				content = "**Error**: This channel does not belong to a user! Use this command in user " +
-						"channels only"
+suspend fun EphemeralSlashCommandContext<*>.inThreadChannel(): Snowflake? =
+	OpenThreadCollection().getDmFromThreadChannel(channel.id)?.userId
+
+/**
+ * This function sets up the database fully for use and runs migrations if requested.
+ *
+ * @param migrate Whether to migrate the database or not
+ * @author NoComment1105
+ * @since 1.0.0
+ */
+suspend inline fun ExtensibleBotBuilder.database(migrate: Boolean) {
+	val db = Database()
+
+	hooks {
+		beforeKoinSetup {
+			loadModule {
+				single { db } bind Database::class
 			}
-			null
+
+			loadModule {
+				single { MetaCollection() } bind MetaCollection::class
+				single { OpenThreadCollection() } bind OpenThreadCollection::class
+			}
+
+			if (migrate) {
+				runBlocking {
+					db.migrate()
+				}
+			}
 		}
-	}
-	return if (userToDm != null) {
-		userToDm
-	} else {
-		null
 	}
 }

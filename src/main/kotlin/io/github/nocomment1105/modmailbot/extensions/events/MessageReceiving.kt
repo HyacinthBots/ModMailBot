@@ -18,15 +18,12 @@ import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import io.github.nocomment1105.modmailbot.MAIL_SERVER
 import io.github.nocomment1105.modmailbot.MAIN_SERVER
-import io.github.nocomment1105.modmailbot.database.DatabaseManager
-import io.github.nocomment1105.modmailbot.database.getOpenThreadsForUser
+import io.github.nocomment1105.modmailbot.database.collections.OpenThreadCollection
+import io.github.nocomment1105.modmailbot.database.entities.OpenThreadData
 import io.github.nocomment1105.modmailbot.messageEmbed
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import mu.KotlinLogging
-import org.jetbrains.exposed.sql.insertIgnore
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 class MessageReceiving : Extension() {
 
@@ -41,19 +38,8 @@ class MessageReceiving : Extension() {
 				failIf(event.message.author?.id == kord.selfId || event.message.author == null)
 			}
 			action {
-				var openThread = false
 				// Check to see if the user has any threads open already
-				newSuspendedTransaction {
-					openThread = try {
-						DatabaseManager.OpenThreads.select {
-							DatabaseManager.OpenThreads.userId eq event.message.author?.id.toString()
-						}.single()
-						true
-					} catch (e: NoSuchElementException) {
-						logger.info("No Thread found! Creating thread for ${event.message.author?.id}")
-						false
-					}
-				}
+				val openThread: Boolean = OpenThreadCollection().getOpenThreadsForUser(event.message.author!!.id) != null
 
 				val mailChannel: TextChannel
 
@@ -62,12 +48,12 @@ class MessageReceiving : Extension() {
 					mailChannel = kord.getGuild(MAIL_SERVER)!!.createTextChannel(event.message.author!!.tag)
 
 					// Store the users thread in the database
-					newSuspendedTransaction {
-						DatabaseManager.OpenThreads.insertIgnore {
-							it[userId] = event.message.author?.id.toString()
-							it[threadId] = mailChannel.id.toString()
-						}
-					}
+					OpenThreadCollection().add(
+					    OpenThreadData(
+						userId = event.message.author!!.id,
+						threadId = mailChannel.id
+					)
+					)
 
 					mailChannel.createMessage {
 						content = "@here" // TODO Implement a config options system
@@ -113,19 +99,19 @@ class MessageReceiving : Extension() {
 					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
 					event.message.addReaction(Emojis.whiteCheckMark)
 				} else {
-					val mailChannelId: String
+					val mailChannelId: Snowflake
 
-					// Attempt to find threads open in the users id. If this failed something has gone horribly wrong
+					// Attempt to find threads open in the users' id. If this failed something has gone horribly wrong
 					try {
 						mailChannelId =
-							getOpenThreadsForUser(event.message.author!!.id, DatabaseManager.OpenThreads.threadId)
+							OpenThreadCollection().getOpenThreadsForUser(event.message.author!!.id)!!.threadId
 					} catch (e: NoSuchElementException) {
 						logger.error("User passed checks yet has no data? What?")
 						return@action
 					}
 
 					// Get the mail server from the config file
-					mailChannel = kord.getGuild(MAIL_SERVER)!!.getChannelOf(Snowflake(mailChannelId))
+					mailChannel = kord.getGuild(MAIL_SERVER)!!.getChannelOf(mailChannelId)
 
 					// Send the user's message through to the mail server
 					mailChannel.createMessage {

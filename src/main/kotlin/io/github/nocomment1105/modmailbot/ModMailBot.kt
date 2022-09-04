@@ -5,7 +5,6 @@ package io.github.nocomment1105.modmailbot
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
-import io.github.nocomment1105.modmailbot.database.DatabaseManager.startDatabase
 import io.github.nocomment1105.modmailbot.extensions.commands.ReplyCommands
 import io.github.nocomment1105.modmailbot.extensions.events.MessageReceiving
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +21,8 @@ suspend fun main() {
 	}
 
 	val bot = ExtensibleBot(BOT_TOKEN) {
+		database(false)
+
 		applicationCommands {
 			defaultGuild(MAIL_SERVER)
 		}
@@ -47,12 +48,6 @@ suspend fun main() {
 				"playing" -> playing(config.getProperty("status"))
 				"watching" -> watching(config.getProperty("status"))
 				else -> watching("for your DMs!")
-			}
-		}
-
-		hooks {
-			afterKoinSetup {
-				startDatabase()
 			}
 		}
 	}
