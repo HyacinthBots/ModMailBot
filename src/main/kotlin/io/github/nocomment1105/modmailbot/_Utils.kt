@@ -15,6 +15,7 @@ import com.kotlindiscord.kord.extensions.commands.application.slash.EphemeralSla
 import com.kotlindiscord.kord.extensions.utils.getTopRole
 import com.kotlindiscord.kord.extensions.utils.loadModule
 import dev.kord.common.Color
+import dev.kord.common.entity.DiscordPartialMessage
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
@@ -39,6 +40,26 @@ fun EmbedBuilder.messageEmbed(message: Message) {
 		icon = message.author?.avatar!!.url
 	}
 	description = message.content
+	timestamp = Clock.System.now()
+	color = DISCORD_RED
+	footer {
+		text = "Message ID: ${message.id}"
+	}
+}
+
+fun EmbedBuilder.editedMessageEmbed(message: Message, oldContent: String, newContent: String) {
+	author {
+		name = message.author?.tag
+		icon = message.author?.avatar?.url
+	}
+	field {
+		name = "Previous content"
+		value = oldContent
+	}
+	field {
+		name = "New content"
+		value = newContent
+	}
 	timestamp = Clock.System.now()
 	color = DISCORD_RED
 	footer {
@@ -91,7 +112,7 @@ suspend fun EmbedBuilder.messageEmbed(
  * @since 1.0.0
  */
 suspend fun EphemeralSlashCommandContext<*>.inThreadChannel(): Snowflake? =
-	OpenThreadCollection().getDmFromThreadChannel(channel.id)?.userId
+	OpenThreadCollection().getDmFromThreadChannel(channel.id)
 
 /**
  * This function sets up the database fully for use and runs migrations if requested.
@@ -121,4 +142,34 @@ suspend inline fun ExtensibleBotBuilder.database(migrate: Boolean) {
 			}
 		}
 	}
+}
+
+/**
+ * Get this message's contents, trimmed to [desiredLength] characters long.
+ * If the message exceeds that length, it will be truncated and an ellipsis appended.
+ *
+ * @param desiredLength The desired length to limit to
+ * @author trainb0y
+ */
+fun Message?.trimmedContents(desiredLength: Int): String? {
+	this ?: return null
+	val useRegularLength = this.content.length < desiredLength.coerceIn(1, 1020)
+	return if (this.content.length > desiredLength.coerceIn(1, 1020)) {
+		this.content.substring(0, if (useRegularLength) this.content.length else desiredLength) + " ..."
+	} else this.content
+}
+
+/**
+ * Get this message's contents, trimmed to [desiredLength] characters long.
+ * If the message exceeds that length, it will be truncated and an ellipsis appended.
+ *
+ * @param desiredLength The desired length to limit to
+ * @author trainb0y
+ */
+fun DiscordPartialMessage?.trimmedContents(desiredLength: Int): String? {
+	this ?: return null
+	val useRegularLength = this.content.value?.length!! < desiredLength.coerceIn(1, 1020)
+	return if (this.content.value!!.length > desiredLength.coerceIn(1, 1020)) {
+		this.content.value!!.substring(0, if (useRegularLength) this.content.value!!.length else desiredLength) + " ..."
+	} else this.content.value
 }

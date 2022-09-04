@@ -77,15 +77,17 @@ class MessageReceiving : Extension() {
 
 							field {
 								name = "Nickname"
-								value = event.message.author!!.asMember(MAIN_SERVER).nickname.toString()
+								value = event.message.author!!.asMember(MAIN_SERVER).nickname ?: "none"
 								inline = true
 							}
 
 							field {
 								val roles = event.message.author!!.asMember(MAIN_SERVER).roles.toList().map { it }
 								name = "Roles"
-								roles.forEach {
-									value += "${it.name}\n"
+								value = if (roles.isEmpty()) {
+									"None"
+								} else {
+									"${roles.forEach { "${it.name}\n" }}"
 								}
 								inline = true
 							}

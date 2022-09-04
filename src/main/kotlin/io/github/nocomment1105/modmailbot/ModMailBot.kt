@@ -12,9 +12,12 @@
 package io.github.nocomment1105.modmailbot
 
 import com.kotlindiscord.kord.extensions.ExtensibleBot
+import dev.kord.cache.map.MapLikeCollection
+import dev.kord.cache.map.internal.MapEntryCache
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import io.github.nocomment1105.modmailbot.extensions.commands.ReplyCommands
+import io.github.nocomment1105.modmailbot.extensions.events.MessageEditing
 import io.github.nocomment1105.modmailbot.extensions.events.MessageReceiving
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -39,10 +42,12 @@ suspend fun main() {
 		extensions {
 			add(::MessageReceiving)
 			add(::ReplyCommands)
+			add(::MessageEditing)
 		}
 
 		intents {
 			+Intent.GuildMembers // Privileged intent
+			+Intent.MessageContent // Privileged intent
 
 			+Intent.DirectMessages
 			+Intent.GuildMessages
@@ -57,6 +62,14 @@ suspend fun main() {
 				"playing" -> playing(config.getProperty("status"))
 				"watching" -> watching(config.getProperty("status"))
 				else -> watching("for your DMs!")
+			}
+		}
+
+		kord {
+			cache {
+				messages { cache, description ->
+					MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+				}
 			}
 		}
 	}

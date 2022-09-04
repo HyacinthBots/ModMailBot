@@ -61,6 +61,6 @@ class OpenThreadCollection : KordExKoinComponent {
 	 * @author NoComment1105
 	 * @since 1.0.0
 	 */
-	suspend fun getDmFromThreadChannel(threadId: Snowflake): OpenThreadData? =
-		collection.findOne(OpenThreadData::threadId eq threadId)
+	suspend fun getDmFromThreadChannel(threadId: Snowflake): Snowflake? =
+		collection.findOne(OpenThreadData::threadId eq threadId)?.userId
 }
