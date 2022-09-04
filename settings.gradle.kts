@@ -9,6 +9,7 @@ pluginManagement {
 
         id("com.github.jakemarsden.git-hooks") version "0.0.2"
         id("com.github.johnrengelman.shadow") version "7.1.2"
+        id("org.cadixdev.licenser") version "0.6.1"
     }
     repositories {
         gradlePluginPortal()

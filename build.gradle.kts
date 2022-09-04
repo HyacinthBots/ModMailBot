@@ -9,6 +9,7 @@ plugins {
     id("com.github.jakemarsden.git-hooks")
     id("com.github.johnrengelman.shadow")
     id("io.gitlab.arturbosch.detekt")
+    id("org.cadixdev.licenser")
 }
 
 group = "io.github.nocomment1105.modmailbot"
@@ -51,7 +52,7 @@ application {
 
 gitHooks {
     setHooks(
-        mapOf("pre-commit" to "detekt")
+        mapOf("pre-commit" to "detekt updateLicenses")
     )
 }
 
@@ -83,4 +84,9 @@ detekt {
     config = files("$rootDir/detekt.yml")
 
     autoCorrect = true
+}
+
+license {
+    setHeader(rootProject.file("HEADER"))
+    include("**/*.kt")
 }
