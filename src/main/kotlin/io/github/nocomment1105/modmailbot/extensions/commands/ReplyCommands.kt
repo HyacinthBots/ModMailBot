@@ -19,6 +19,8 @@ import com.kotlindiscord.kord.extensions.types.respond
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.rest.builder.message.create.embed
 import io.github.nocomment1105.modmailbot.MAIL_SERVER
+import io.github.nocomment1105.modmailbot.database.collections.SentMessageCollection
+import io.github.nocomment1105.modmailbot.database.entities.SentMessageData
 import io.github.nocomment1105.modmailbot.inThreadChannel
 import io.github.nocomment1105.modmailbot.messageEmbed
 
@@ -36,19 +38,29 @@ class ReplyCommands : Extension() {
 			action {
 				val userToDm = inThreadChannel() ?: return@action
 
-				val dmChannel = this@ephemeralSlashCommand.kord.getUser(userToDm)!!.getDmChannel()
+				val dmChannel = event.kord.getUser(userToDm)!!.getDmChannel()
 
-				dmChannel.createMessage {
+				val dmChannelMessage = dmChannel.createMessage {
 					embed {
 						messageEmbed(arguments.content, user.asUser(), guild!!.id, DISCORD_GREEN)
 					}
 				}
 
-				channel.createMessage {
+				val threadMessageId = channel.createMessage {
 					embed {
 						messageEmbed(arguments.content, user.asUser(), guild!!.id, DISCORD_GREEN)
 					}
 				}
+
+				SentMessageCollection().addMessage(
+					SentMessageData(
+						channel.id,
+						SentMessageCollection().getNextMessageNumber(channel.id),
+						dmChannelMessage.id,
+						threadMessageId.id,
+						true
+					)
+				)
 
 				respond { content = "Message sent" }
 			}
@@ -65,20 +77,30 @@ class ReplyCommands : Extension() {
 			action {
 				val userToDm = inThreadChannel() ?: return@action
 
-				val dmChannel = this@ephemeralSlashCommand.kord.getUser(userToDm)!!.getDmChannel()
+				val dmChannel = event.kord.getUser(userToDm)!!.getDmChannel()
 
-				dmChannel.createMessage {
+				val dmChannelMessage = dmChannel.createMessage {
 					embed {
 						// Send an anonymous response to the user
 						messageEmbed(arguments.content, user.asUser(), guild!!.id, DISCORD_GREEN, true)
 					}
 				}
 
-				channel.createMessage {
+				val threadMessageId = channel.createMessage {
 					embed {
 						messageEmbed("(Anonymous) ${arguments.content}", user.asUser(), guild!!.id, DISCORD_GREEN)
 					}
 				}
+
+				SentMessageCollection().addMessage(
+					SentMessageData(
+						channel.id,
+						SentMessageCollection().getNextMessageNumber(channel.id),
+						dmChannelMessage.id,
+						threadMessageId.id,
+						true
+					)
+				)
 
 				respond { content = "Message sent" }
 			}

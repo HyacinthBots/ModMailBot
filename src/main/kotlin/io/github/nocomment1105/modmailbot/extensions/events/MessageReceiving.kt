@@ -16,7 +16,6 @@ import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.time.TimestampType
 import com.kotlindiscord.kord.extensions.time.toDiscord
 import com.kotlindiscord.kord.extensions.utils.createdAt
-import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.createTextChannel
 import dev.kord.core.behavior.getChannelOf
@@ -28,7 +27,9 @@ import dev.kord.x.emoji.addReaction
 import io.github.nocomment1105.modmailbot.MAIL_SERVER
 import io.github.nocomment1105.modmailbot.MAIN_SERVER
 import io.github.nocomment1105.modmailbot.database.collections.OpenThreadCollection
+import io.github.nocomment1105.modmailbot.database.collections.SentMessageCollection
 import io.github.nocomment1105.modmailbot.database.entities.OpenThreadData
+import io.github.nocomment1105.modmailbot.database.entities.SentMessageData
 import io.github.nocomment1105.modmailbot.messageEmbed
 import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
@@ -36,7 +37,7 @@ import mu.KotlinLogging
 
 class MessageReceiving : Extension() {
 
-	override val name = "messagereceiving"
+	override val name = "message-receiving"
 
 	override suspend fun setup() {
 		val logger = KotlinLogging.logger("Message Receiving")
@@ -48,7 +49,8 @@ class MessageReceiving : Extension() {
 			}
 			action {
 				// Check to see if the user has any threads open already
-				val openThread: Boolean = OpenThreadCollection().getOpenThreadsForUser(event.message.author!!.id) != null
+				val openThread: Boolean =
+					OpenThreadCollection().getOpenThreadsForUser(event.message.author!!.id) != null
 
 				val mailChannel: TextChannel
 
@@ -58,10 +60,10 @@ class MessageReceiving : Extension() {
 
 					// Store the users thread in the database
 					OpenThreadCollection().add(
-					    OpenThreadData(
-						userId = event.message.author!!.id,
-						threadId = mailChannel.id
-					)
+						OpenThreadData(
+							userId = event.message.author!!.id,
+							threadId = mailChannel.id
+						)
 					)
 
 					mailChannel.createMessage {
@@ -98,36 +100,49 @@ class MessageReceiving : Extension() {
 										" DM ID: ${event.message.author!!.getDmChannel().id}"
 							}
 						}
+					}
 
+					val mailChannelMessage = mailChannel.createMessage {
 						// Send the message through to the mail server
 						embed {
 							messageEmbed(event.message)
 						}
 					}
 
+					SentMessageCollection().addMessage(
+						SentMessageData(
+							mailChannel.id,
+							SentMessageCollection().getNextMessageNumber(mailChannel.id),
+							event.message.id,
+							mailChannelMessage.id,
+							false
+						)
+					)
+
 					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
 					event.message.addReaction(Emojis.whiteCheckMark)
 				} else {
-					val mailChannelId: Snowflake
-
-					// Attempt to find threads open in the users' id. If this failed something has gone horribly wrong
-					try {
-						mailChannelId =
-							OpenThreadCollection().getOpenThreadsForUser(event.message.author!!.id)!!.threadId
-					} catch (e: NoSuchElementException) {
-						logger.error("User passed checks yet has no data? What?")
-						return@action
-					}
-
 					// Get the mail server from the config file
-					mailChannel = kord.getGuild(MAIL_SERVER)!!.getChannelOf(mailChannelId)
+					mailChannel = kord.getGuild(MAIL_SERVER)!!.getChannelOf(
+						OpenThreadCollection().getOpenThreadsForUser(event.message.author!!.id)!!.threadId
+					)
 
 					// Send the user's message through to the mail server
-					mailChannel.createMessage {
+					val mailChannelMessage = mailChannel.createMessage {
 						embed {
 							messageEmbed(event.message)
 						}
 					}
+
+					SentMessageCollection().addMessage(
+						SentMessageData(
+							mailChannel.id,
+							SentMessageCollection().getNextMessageNumber(mailChannel.id),
+							event.message.id,
+							mailChannelMessage.id,
+							false
+						)
+					)
 
 					// React to the message in DMs with a white_check_mark, once the message is sent to the mail sever
 					event.message.addReaction(Emojis.whiteCheckMark)
