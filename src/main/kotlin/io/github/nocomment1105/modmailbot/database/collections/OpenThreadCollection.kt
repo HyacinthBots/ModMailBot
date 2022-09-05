@@ -40,7 +40,16 @@ class OpenThreadCollection : KordExKoinComponent {
 	 * @author NoComment1105
 	 * @since 1.0.0
 	 */
-	suspend fun remove(userId: Snowflake) = collection.deleteOne(OpenThreadData::userId eq userId)
+	suspend fun removeByUser(userId: Snowflake) = collection.deleteOne(OpenThreadData::userId eq userId)
+
+	/**
+	 * Removes a thread from the database.
+	 *
+	 * @param threadId The thread id to remove
+	 * @author NoComment1105
+	 * @since 1.0.0
+	 */
+	suspend fun removeByThread(threadId: Snowflake) = collection.deleteOne(OpenThreadData::threadId eq threadId)
 
 	/**
 	 * Gets the open thread for the user. There should only ever be one at a time, hence we return the [first] element
@@ -57,7 +66,7 @@ class OpenThreadCollection : KordExKoinComponent {
 	 * Gets the DM id from the [threadId].
 	 *
 	 * @param threadId The channel to get the DM id from
-	 * @return The user ID, also the dm channel Id
+	 * @return The user ID, also the dm channel id
 	 * @author NoComment1105
 	 * @since 1.0.0
 	 */

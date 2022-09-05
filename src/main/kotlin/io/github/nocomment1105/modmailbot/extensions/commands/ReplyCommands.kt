@@ -10,7 +10,6 @@
 package io.github.nocomment1105.modmailbot.extensions.commands
 
 import com.kotlindiscord.kord.extensions.DISCORD_GREEN
-import com.kotlindiscord.kord.extensions.checks.inGuild
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.Extension
@@ -32,9 +31,8 @@ class ReplyCommands : Extension() {
 			name = "reply"
 			description = "Reply to the user this thread channel is owned by"
 
-			check {
-				inGuild(MAIL_SERVER)
-			}
+			guild(MAIL_SERVER)
+
 			action {
 				val userToDm = inThreadChannel() ?: return@action
 
@@ -71,9 +69,7 @@ class ReplyCommands : Extension() {
 			name = "anonreply"
 			description = "Reply anonymously to the user this thread channel is owned by"
 
-			check {
-				inGuild(MAIL_SERVER)
-			}
+			guild(MAIL_SERVER)
 
 			action {
 				val userToDm = inThreadChannel() ?: return@action

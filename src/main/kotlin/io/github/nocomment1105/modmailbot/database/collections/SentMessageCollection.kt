@@ -120,4 +120,15 @@ class SentMessageCollection : KordExKoinComponent {
 	} catch (e: NoSuchElementException) {
 		1
 	}
+
+	/**
+	 * Removes all messages from the database.
+	 *
+	 * @param threadId THe ID of the thread to remove messages for
+	 *
+	 * @author NoComment1105
+	 * @since 1.0.0
+	 */
+	suspend inline fun removeMessages(threadId: Snowflake) =
+		collection.deleteMany(SentMessageData::threadId eq threadId)
 }

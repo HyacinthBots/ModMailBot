@@ -16,6 +16,7 @@ import dev.kord.cache.map.MapLikeCollection
 import dev.kord.cache.map.internal.MapEntryCache
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import io.github.nocomment1105.modmailbot.extensions.commands.CloseCommands
 import io.github.nocomment1105.modmailbot.extensions.commands.ReplyCommands
 import io.github.nocomment1105.modmailbot.extensions.events.MessageEditing
 import io.github.nocomment1105.modmailbot.extensions.events.MessageReceiving
@@ -43,6 +44,7 @@ suspend fun main() {
 			add(::MessageReceiving)
 			add(::ReplyCommands)
 			add(::MessageEditing)
+			add(::CloseCommands)
 		}
 
 		intents {
