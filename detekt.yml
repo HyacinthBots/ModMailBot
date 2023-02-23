@@ -49,7 +49,7 @@ complexity:
   ComplexCondition:
     active: true
     threshold: 10
-  ComplexMethod:
+  CyclomaticComplexMethod:
     active: false
   LargeClass:
     active: false
@@ -62,8 +62,8 @@ complexity:
   ReplaceSafeCallChainWithRun:
     active: true
   StringLiteralDuplication:
-    active: true
-    threshold: 3
+    active: false
+    threshold: 5
     ignoreAnnotation: true
     excludeStringsWithLessThan5Characters: true
     ignoreStringsRegex: '$^'
@@ -162,17 +162,20 @@ formatting:
   EnumEntryNameCase:
     active: true
     autoCorrect: true
+  Filename:
+    active: false
   Indentation:
     active: false
     autoCorrect: false
     indentSize: 4
-    continuationIndentSize: 4
   MultiLineIfElse:
     active: true
     autoCorrect: true
   NoEmptyFirstLineInMethodBlock:
     active: true
     autoCorrect: true
+  NoWildcardImports:
+    packagesToUseImportOnDemandProperty: ""
   PackageName:
     active: true
     autoCorrect: true
@@ -211,14 +214,14 @@ naming:
     ignoreOverridden: true
   InvalidPackageDeclaration:
     active: true
-    rootPackage: 'net.irisshaders'
+    rootPackage: 'org.hyacinthbots'
+  MemberNameEqualsClassName:
+    active: false
   NonBooleanPropertyPrefixedWithIs:
     active: true
   PackageNaming:
     active: true
     packagePattern: '^[a-z]+(\.[a-z][A-Za-z0-9]*)*$'
-  MemberNameEqualsClassName:
-    active: false
 
 # https://detekt.dev/performance.html
 performance:
@@ -268,7 +271,7 @@ style:
     active: true
   DataClassContainsFunctions:
     active: true
-    conversionFunctionPrefix: 'to'
+    conversionFunctionPrefix: ['to']
   DataClassShouldBeImmutable:
     active: true
   EqualsOnSignatureLine:
@@ -291,16 +294,12 @@ style:
   ForbiddenMethodCall:
     active: false
     methods: []
-  ForbiddenPublicDataClass:
-    active: false
-    ignorePackages: ['*.internal', '*.internal.*']
   ForbiddenVoid:
     active: true
     ignoreOverridden: true
     ignoreUsageInGenerics: false
   LoopWithTooManyJumpStatements:
-    active: true
-    maxJumpCount: 3
+    active: false
   MagicNumber:
     active: false
     ignoreNumbers: ['-1', '0', '1', '2']
@@ -330,7 +329,7 @@ style:
   ReturnCount:
     active: false
     max: 2
-    excludedFunctions: 'equals'
+    excludedFunctions: ['equals']
     excludeLabeled: false
     excludeReturnFromLambda: true
     excludeGuardClauses: false
@@ -346,7 +345,7 @@ style:
   UnnecessaryLet:
     active: true
   UnnecessaryParentheses:
-    active: true
+    active: false # Conflicts with IntelliJ
   UntilInsteadOfRangeTo:
     active: true
   UnusedImports:

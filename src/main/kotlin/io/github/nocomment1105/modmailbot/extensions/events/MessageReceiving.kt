@@ -56,7 +56,7 @@ class MessageReceiving : Extension() {
 
 				if (!openThread) {
 					// Get the mail channel
-					mailChannel = kord.getGuild(MAIL_SERVER)!!.createTextChannel(event.message.author!!.tag)
+					mailChannel = kord.getGuildOrNull(MAIL_SERVER)!!.createTextChannel(event.message.author!!.tag)
 
 					// Store the users thread in the database
 					OpenThreadCollection().add(
@@ -126,7 +126,7 @@ class MessageReceiving : Extension() {
 					event.message.addReaction(Emojis.whiteCheckMark)
 				} else {
 					// Get the mail server from the config file
-					mailChannel = kord.getGuild(MAIL_SERVER)!!.getChannelOf(
+					mailChannel = kord.getGuildOrNull(MAIL_SERVER)!!.getChannelOf(
 						OpenThreadCollection().getOpenThreadsForUser(event.message.author!!.id)!!.threadId
 					)
 

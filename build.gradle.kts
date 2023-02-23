@@ -1,3 +1,6 @@
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -12,20 +15,21 @@ plugins {
     id("org.cadixdev.licenser")
 }
 
-group = "io.github.nocomment1105.modmailbot"
+group = "org.hyacinthbots.modmailbot"
 version = "1.0-SNAPSHOT"
+val javaTarget = 17
 
 repositories {
     mavenCentral()
 
     maven {
-        name = "Kotlin Discord"
-        url = uri("https://maven.kotlindiscord.com/repository/maven-public/")
+        name = "Sonatype Snapshots (Legacy)"
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
     }
 
     maven {
         name = "Sonatype Snapshots"
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
     }
 }
 
@@ -47,7 +51,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("io.github.nocomment1105.modmailbot.ModMailBot.kt")
+    mainClass.set("org.hyacinthbots.modmailbot.ModMailBot.kt")
 }
 
 gitHooks {
@@ -56,25 +60,33 @@ gitHooks {
     )
 }
 
+kotlin {
+    jvmToolchain(javaTarget)
+}
+
 tasks {
     withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "17"
-            languageVersion = "1.7"
-            freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(javaTarget.toString()))
+            languageVersion.set(KotlinVersion.fromVersion(libs.versions.kotlin.get().substringBeforeLast(".")))
+            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
             incremental = true
         }
     }
     jar {
         manifest {
             attributes(
-                "Main-Class" to "io.github.nocomment1105.modmailbot.ModMailBot.kt"
+                "Main-Class" to "org.hyacinthbots.modmailbot.ModMailBot.kt"
             )
         }
     }
 
+    java {
+        sourceCompatibility = JavaVersion.toVersion(javaTarget)
+        targetCompatibility = JavaVersion.toVersion(javaTarget)
+    }
+
     wrapper {
-        gradleVersion = "7.5.1"
         distributionType = Wrapper.DistributionType.BIN
     }
 }

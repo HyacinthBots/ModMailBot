@@ -123,7 +123,7 @@ fun EmbedBuilder.editedMessageEmbed(
  * @author NoComment1105
  * @since 1.0.0
  */
-suspend fun EphemeralSlashCommandContext<*>.inThreadChannel(): Snowflake? =
+suspend fun EphemeralSlashCommandContext<*, *>.inThreadChannel(): Snowflake? =
 	OpenThreadCollection().getDmFromThreadChannel(channel.id)
 
 /**
@@ -168,7 +168,9 @@ fun Message?.trimmedContents(desiredLength: Int): String? {
 	val useRegularLength = this.content.length < desiredLength.coerceIn(1, 1020)
 	return if (this.content.length > desiredLength.coerceIn(1, 1020)) {
 		this.content.substring(0, if (useRegularLength) this.content.length else desiredLength) + " ..."
-	} else this.content
+	} else {
+	    this.content
+	}
 }
 
 /**
@@ -183,5 +185,7 @@ fun DiscordPartialMessage?.trimmedContents(desiredLength: Int): String? {
 	val useRegularLength = this.content.value?.length!! < desiredLength.coerceIn(1, 1020)
 	return if (this.content.value!!.length > desiredLength.coerceIn(1, 1020)) {
 		this.content.value!!.substring(0, if (useRegularLength) this.content.value!!.length else desiredLength) + " ..."
-	} else this.content.value
+	} else {
+	    this.content.value
+	}
 }

@@ -56,7 +56,7 @@ class MessageEditing : Extension() {
 				val threadMessageIdToEdit =
 					SentMessageCollection().getInternalMessageById(userThread!!.threadId, event.messageId)!!
 				val threadMessageToEdit =
-					kord.getGuild(MAIL_SERVER)!!.getChannelOf<GuildMessageChannel>(userThread.threadId)
+					kord.getGuildOrNull(MAIL_SERVER)!!.getChannelOf<GuildMessageChannel>(userThread.threadId)
 						.getMessage(threadMessageIdToEdit)
 
 				threadMessageToEdit.edit {
