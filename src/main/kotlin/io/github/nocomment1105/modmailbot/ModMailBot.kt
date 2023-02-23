@@ -23,7 +23,7 @@ import io.github.nocomment1105.modmailbot.extensions.events.MessageReceiving
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
-import java.util.*
+import java.util.Properties
 
 val file = FileInputStream("config.properties")
 val config = Properties()
