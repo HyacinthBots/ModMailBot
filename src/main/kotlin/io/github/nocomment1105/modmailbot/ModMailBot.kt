@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -11,11 +11,11 @@
 
 package io.github.nocomment1105.modmailbot
 
-import com.kotlindiscord.kord.extensions.ExtensibleBot
 import dev.kord.cache.map.MapLikeCollection
 import dev.kord.cache.map.internal.MapEntryCache
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import dev.kordex.core.ExtensibleBot
 import io.github.nocomment1105.modmailbot.extensions.commands.CloseCommands
 import io.github.nocomment1105.modmailbot.extensions.commands.ReplyCommands
 import io.github.nocomment1105.modmailbot.extensions.events.MessageEditing
@@ -23,7 +23,7 @@ import io.github.nocomment1105.modmailbot.extensions.events.MessageReceiving
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
-import java.util.Properties
+import java.util.*
 
 val file = FileInputStream("config.properties")
 val config = Properties()

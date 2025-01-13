@@ -1,0 +1,62 @@
+[versions]
+# Base
+kotlin = "2.1.0"
+kord-extensions = "2.3.1-20250108.190136-25"
+kord-extensions-plugin = "1.6.1"
+kordx-emoji = "0.5.0"
+# ---
+# Logging
+logging = "7.0.3"
+logback = "1.5.16"
+logback-groovy = "1.14.5"
+groovy = "3.0.23"
+jansi = "2.4.1"
+# ---
+# Formatting
+detekt = "1.23.7"
+# ---
+# Database
+mongo = "5.3.0"
+# ---
+# Extra Utilities
+git-hooks = "0.0.2"
+shadow = "8.1.1"
+licenser = "0.6.1"
+# ---
+
+[libraries]
+# Base
+kord-extensions = { module = "dev.kordex:kord-extensions", version.ref = "kord-extensions" }
+kord-extensions-unsafe = { module = "dev.kordex.modules:dev-unsafe", version.ref = "kord-extensions" }
+kordx-emoji = { module = "dev.kord.x:emoji", version.ref = "kordx-emoji"}
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
+# ---
+# Logging
+logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+logback-groovy = { module = "io.github.virtualdogbert:logback-groovy-config", version.ref = "logback-groovy" }
+logging = { module = "io.github.oshai:kotlin-logging", version.ref = "logging" }
+groovy = { module = "org.codehaus.groovy:groovy", version.ref = "groovy" }
+jansi = { module = "org.fusesource.jansi:jansi", version.ref = "jansi" }
+# ---
+# Formatting
+detekt = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+# ---
+# Database
+mongo-driver = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongo" }
+mongo-bson = { module = "org.mongodb:bson-kotlin", version.ref = "mongo"}
+# ---
+
+[plugins]
+# Base
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kord-extensions-plugin = { id = "dev.kordex.gradle.kordex", version.ref = "kord-extensions-plugin"}
+# ---
+# Formatting
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+# ---
+# Extra Utilities
+git-hooks = { id = "com.github.jakemarsden.git-hooks", version.ref = "git-hooks" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+licenser = { id = "org.cadixdev.licenser", version.ref = "licenser"}
+# ---

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -9,20 +9,20 @@
 
 package io.github.nocomment1105.modmailbot
 
-import com.kotlindiscord.kord.extensions.DISCORD_RED
-import com.kotlindiscord.kord.extensions.builders.ExtensibleBotBuilder
-import com.kotlindiscord.kord.extensions.commands.application.slash.EphemeralSlashCommandContext
-import com.kotlindiscord.kord.extensions.utils.getTopRole
-import com.kotlindiscord.kord.extensions.utils.loadModule
 import dev.kord.common.Color
 import dev.kord.common.entity.DiscordPartialMessage
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
 import dev.kord.rest.builder.message.EmbedBuilder
+import dev.kordex.core.DISCORD_RED
+import dev.kordex.core.builders.ExtensibleBotBuilder
+import dev.kordex.core.commands.application.slash.EphemeralSlashCommandContext
+import dev.kordex.core.utils.getTopRole
+import dev.kordex.core.utils.loadModule
 import io.github.nocomment1105.modmailbot.database.Database
 import io.github.nocomment1105.modmailbot.database.collections.MetaCollection
-import io.github.nocomment1105.modmailbot.database.collections.OpenThreadCollection
+import io.github.nocomment1105.modmailbot.database.collections.OpenThreadsCollection
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import org.koin.dsl.bind
@@ -37,7 +37,7 @@ import org.koin.dsl.bind
 fun EmbedBuilder.messageEmbed(message: Message) {
 	author {
 		name = message.author?.tag
-		icon = message.author?.avatar!!.url
+		icon = message.author?.avatar?.cdnUrl?.toUrl()
 	}
 	description = message.content
 	timestamp = Clock.System.now()
@@ -70,7 +70,7 @@ suspend fun EmbedBuilder.messageEmbed(
 	author {
 		if (!anonymous) {
 			name = author.tag
-			icon = author.avatar!!.url
+			icon = author.avatar?.cdnUrl?.toUrl()
 		} else {
 			name = author.asMember(MAIL_SERVER).getTopRole()!!.name
 		}
@@ -124,7 +124,7 @@ fun EmbedBuilder.editedMessageEmbed(
  * @since 1.0.0
  */
 suspend fun EphemeralSlashCommandContext<*, *>.inThreadChannel(): Snowflake? =
-	OpenThreadCollection().getDmFromThreadChannel(channel.id)
+	OpenThreadsCollection().getDmFromThreadChannel(channel.id)
 
 /**
  * This function sets up the database fully for use and runs migrations if requested.
@@ -144,7 +144,7 @@ suspend inline fun ExtensibleBotBuilder.database(migrate: Boolean) {
 
 			loadModule {
 				single { MetaCollection() } bind MetaCollection::class
-				single { OpenThreadCollection() } bind OpenThreadCollection::class
+				single { OpenThreadsCollection() } bind OpenThreadsCollection::class
 			}
 
 			if (migrate) {

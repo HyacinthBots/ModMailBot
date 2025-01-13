@@ -1,4 +1,5 @@
 
+import dev.kordex.gradle.plugins.kordex.DataCollection
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -6,21 +7,38 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     application
 
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-
-    id("com.github.jakemarsden.git-hooks")
-    id("com.github.johnrengelman.shadow")
-    id("io.gitlab.arturbosch.detekt")
-    id("org.cadixdev.licenser")
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.git.hooks)
+    alias(libs.plugins.kord.extensions.plugin)
+    alias(libs.plugins.licenser)
 }
 
 group = "org.hyacinthbots.modmailbot"
 version = "1.0-SNAPSHOT"
-val javaTarget = 17
+
+val className = "org.hyacinthbots.modmailbot.ModMailBotKt"
+val javaTarget = "21"
 
 repositories {
     mavenCentral()
+
+    maven {
+        name = "Kord Snapshots"
+        url = uri("https://repo.kord.dev/snapshots")
+    }
+
+    maven {
+        name = "Kord Extensions (Releases)"
+        url = uri("https://releases-repo.kordex.dev")
+    }
+
+    maven {
+        name = "Kord Extensions (Snapshots)"
+        url = uri("https://snapshots-repo.kordex.dev")
+    }
 
     maven {
         name = "Sonatype Snapshots (Legacy)"
@@ -29,7 +47,7 @@ repositories {
 
     maven {
         name = "Sonatype Snapshots"
-        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
 }
 
@@ -41,17 +59,36 @@ dependencies {
 
     // Logging dependencies
     implementation(libs.logback)
+    implementation(libs.logback.groovy)
     implementation(libs.logging)
+    implementation(libs.groovy)
+    implementation(libs.jansi)
 
     // Formatting
     detektPlugins(libs.detekt)
 
     // Database
-    implementation(libs.kmongo)
+    implementation(libs.mongo.driver)
+    implementation(libs.mongo.bson)
+}
+
+kordEx {
+    addDependencies = false
+    addRepositories = false
+    ignoreIncompatibleKotlinVersion = true
+
+    bot {
+        dataCollection(DataCollection.None)
+    }
+
+    i18n {
+        classPackage = "modmailbot.i18n"
+        translationBundle = "modmailbot.strings"
+    }
 }
 
 application {
-    mainClass.set("org.hyacinthbots.modmailbot.ModMailBot.kt")
+    mainClass.set(className)
 }
 
 gitHooks {
@@ -60,14 +97,10 @@ gitHooks {
     )
 }
 
-kotlin {
-    jvmToolchain(javaTarget)
-}
-
 tasks {
     withType<KotlinCompile> {
         compilerOptions {
-            jvmTarget.set(JvmTarget.fromTarget(javaTarget.toString()))
+            jvmTarget.set(JvmTarget.fromTarget(javaTarget))
             languageVersion.set(KotlinVersion.fromVersion(libs.versions.kotlin.get().substringBeforeLast(".")))
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
             incremental = true
@@ -75,9 +108,7 @@ tasks {
     }
     jar {
         manifest {
-            attributes(
-                "Main-Class" to "org.hyacinthbots.modmailbot.ModMailBot.kt"
-            )
+            attributes("Main-Class" to className)
         }
     }
 
@@ -93,7 +124,7 @@ tasks {
 
 detekt {
     buildUponDefaultConfig = true
-    config = files("$rootDir/detekt.yml")
+    config.setFrom("$rootDir/detekt.yml")
 
     autoCorrect = true
 }
@@ -101,4 +132,5 @@ detekt {
 license {
     setHeader(rootProject.file("HEADER"))
     include("**/*.kt")
+    exclude("**/Translations.kt")
 }

@@ -175,6 +175,7 @@ formatting:
     active: true
     autoCorrect: true
   NoWildcardImports:
+    active: false
     packagesToUseImportOnDemandProperty: ""
   PackageName:
     active: true
@@ -211,12 +212,9 @@ naming:
     active: true
     functionPattern: '^([a-z$][a-zA-Z$0-9]*)|(`.*`)$'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
   InvalidPackageDeclaration:
     active: true
-    rootPackage: 'org.hyacinthbots'
-  MemberNameEqualsClassName:
-    active: false
+    rootPackage: 'org.HyacinthBots'
   NonBooleanPropertyPrefixedWithIs:
     active: true
   PackageNaming:
@@ -285,7 +283,7 @@ style:
     includeLineWrapping: true
   ForbiddenComment:
     active: false
-    values: ['TODO:', 'FIXME:', 'STOPSHIP:']
+    comments: ['TODO:', 'FIXME:', 'STOPSHIP:']
     allowedPatterns: ''
   ForbiddenImport:
     active: false
@@ -312,14 +310,10 @@ style:
     ignoreNamedArgument: true
     ignoreEnums: true
     ignoreRanges: false
-  MandatoryBracesIfStatements:
-    active: true
   MandatoryBracesLoops:
     active: true
   OptionalUnit:
     active: false
-  OptionalWhenBraces:
-    active: true
   PreferToOverPairSyntax:
     active: true
   RedundantExplicitType:
@@ -368,3 +362,5 @@ style:
     active: true
   UseRequireNotNull:
     active: true
+  WildcardImport:
+    active: false

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -9,9 +9,9 @@
 
 package io.github.nocomment1105.modmailbot.database.migrations
 
-import org.litote.kmongo.coroutine.CoroutineDatabase
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 
 @Suppress("UnusedPrivateMember")
-suspend fun v1(db: CoroutineDatabase) {
+suspend fun v1(db: MongoDatabase) {
 	// Currently no migration needed. This is in preparation for actually needing one
 }

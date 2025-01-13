@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -9,27 +9,28 @@
 
 package io.github.nocomment1105.modmailbot.extensions.commands
 
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.coalescingOptionalDuration
-import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingBoolean
-import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalString
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.ephemeralSlashCommand
-import com.kotlindiscord.kord.extensions.utils.scheduling.Scheduler
-import com.kotlindiscord.kord.extensions.utils.scheduling.Task
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.channel.DmChannel
 import dev.kord.core.entity.channel.MessageChannel
-import dev.kord.rest.builder.message.create.embed
+import dev.kord.rest.builder.message.embed
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.coalescingOptionalDuration
+import dev.kordex.core.commands.converters.impl.defaultingBoolean
+import dev.kordex.core.commands.converters.impl.optionalString
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.extensions.ephemeralSlashCommand
+import dev.kordex.core.utils.scheduling.Scheduler
+import dev.kordex.core.utils.scheduling.Task
 import io.github.nocomment1105.modmailbot.MAIL_SERVER
 import io.github.nocomment1105.modmailbot.database.collections.CloseQueueCollection
-import io.github.nocomment1105.modmailbot.database.collections.OpenThreadCollection
-import io.github.nocomment1105.modmailbot.database.collections.SentMessageCollection
+import io.github.nocomment1105.modmailbot.database.collections.OpenThreadsCollection
+import io.github.nocomment1105.modmailbot.database.collections.SentMessagesCollection
 import io.github.nocomment1105.modmailbot.database.entities.CloseQueueData
 import io.github.nocomment1105.modmailbot.inThreadChannel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
+import modmailbot.i18n.Translations
 
 class CloseCommands : Extension() {
 	override val name = "close-commands"
@@ -44,8 +45,8 @@ class CloseCommands : Extension() {
 		task = scheduler.schedule(30, pollingSeconds = 1, repeat = true, callback = ::closeThreads)
 
 		ephemeralSlashCommand(::CloseArgs) {
-			name = "close"
-			description = "Close this thread"
+			name = Translations.Commands.Close.name
+			description = Translations.Commands.Close.description
 
 			guild(MAIL_SERVER)
 
@@ -81,19 +82,19 @@ class CloseCommands : Extension() {
 
 	inner class CloseArgs : Arguments() {
 		val delay by coalescingOptionalDuration {
-			name = "delay"
-			description = "How long until you want to close this thread"
+			name = Translations.Commands.Close.Args.Delay.name
+			description = Translations.Commands.Close.Args.Delay.description
 		}
 
 		val silent by defaultingBoolean {
-			name = "silent"
-			description = "Whether to close this thread silently"
+			name = Translations.Commands.Close.Args.Silent.name
+			description = Translations.Commands.Close.Args.Silent.description
 			defaultValue = false
 		}
 
 		val message by optionalString {
-			name = "message"
-			description = "The closing message to send to the user."
+			name = Translations.Commands.Close.Args.Message.name
+			description = Translations.Commands.Close.Args.Message.description
 		}
 	}
 
@@ -135,10 +136,10 @@ class CloseCommands : Extension() {
 suspend fun sendThreadCloseMessage(dmChannel: DmChannel, channel: MessageChannel, closeMessage: String?) {
 	dmChannel.createMessage {
 		embed {
-			title = "Modmail thread closed"
+			title = Translations.Commands.Close.ClosedEmbed.title.translate()
 			if (closeMessage != null) description = closeMessage
 			footer {
-				text = "Replying will create a new thread"
+				text = Translations.Commands.Close.ClosedEmbed.footer.translate()
 			}
 			timestamp = Clock.System.now()
 		}
@@ -162,7 +163,7 @@ suspend fun deleteThread(channel: MessageChannel, closeMessage: String?) {
 
 	// TODO create a log in some way for moderators to look back on
 
-	SentMessageCollection().removeMessages(channel.id)
-	OpenThreadCollection().removeByThread(channel.id)
+	SentMessagesCollection().removeMessages(channel.id)
+	OpenThreadsCollection().removeByThread(channel.id)
 	CloseQueueCollection().removeThreadFromQueue(channel.id)
 }
