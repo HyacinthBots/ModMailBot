@@ -16,7 +16,7 @@ jansi = "2.4.1"
 detekt = "1.23.7"
 # ---
 # Database
-mongo = "5.2.1"
+mongo = "5.3.0"
 # ---
 # Extra Utilities
 git-hooks = "0.0.2"
