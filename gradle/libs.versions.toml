@@ -9,7 +9,7 @@ kordx-emoji = "0.5.0"
 logging = "7.0.3"
 logback = "1.5.16"
 logback-groovy = "1.14.5"
-groovy = "3.0.22"
+groovy = "3.0.23"
 jansi = "2.4.1"
 # ---
 # Formatting
