@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *

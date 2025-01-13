@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -9,11 +9,11 @@
 
 package io.github.nocomment1105.modmailbot.database
 
-import com.kotlindiscord.kord.extensions.koin.KordExKoinComponent
+import dev.kordex.core.koin.KordExKoinComponent
 import io.github.nocomment1105.modmailbot.database.collections.MetaCollection
 import io.github.nocomment1105.modmailbot.database.entities.MetaData
 import io.github.nocomment1105.modmailbot.database.migrations.v1
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.koin.core.component.inject
 
 object Migrator : KordExKoinComponent {

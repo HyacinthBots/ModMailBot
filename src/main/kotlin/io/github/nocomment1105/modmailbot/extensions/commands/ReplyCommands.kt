@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -9,27 +9,27 @@
 
 package io.github.nocomment1105.modmailbot.extensions.commands
 
-import com.kotlindiscord.kord.extensions.DISCORD_GREEN
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.string
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.ephemeralSlashCommand
-import com.kotlindiscord.kord.extensions.types.respond
 import dev.kord.core.behavior.channel.createMessage
-import dev.kord.rest.builder.message.create.embed
+import dev.kord.rest.builder.message.embed
+import dev.kordex.core.DISCORD_GREEN
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.string
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.extensions.ephemeralSlashCommand
 import io.github.nocomment1105.modmailbot.MAIL_SERVER
-import io.github.nocomment1105.modmailbot.database.collections.SentMessageCollection
+import io.github.nocomment1105.modmailbot.database.collections.SentMessagesCollection
 import io.github.nocomment1105.modmailbot.database.entities.SentMessageData
 import io.github.nocomment1105.modmailbot.inThreadChannel
 import io.github.nocomment1105.modmailbot.messageEmbed
+import modmailbot.i18n.Translations
 
 class ReplyCommands : Extension() {
 	override val name = "reply-commands"
 
 	override suspend fun setup() {
 		ephemeralSlashCommand(::ReplyArgs) {
-			name = "reply"
-			description = "Reply to the user this thread channel is owned by"
+			name = Translations.Commands.Reply.Reply.name
+			description = Translations.Commands.Reply.Reply.description
 
 			guild(MAIL_SERVER)
 
@@ -50,10 +50,10 @@ class ReplyCommands : Extension() {
 					}
 				}
 
-				SentMessageCollection().addMessage(
+				SentMessagesCollection().addMessage(
 					SentMessageData(
 						channel.id,
-						SentMessageCollection().getNextMessageNumber(channel.id),
+						SentMessagesCollection().getNextMessageNumber(channel.id),
 						dmChannelMessage.id,
 						threadMessageId.id,
 						wasSentByStaff = true,
@@ -61,13 +61,13 @@ class ReplyCommands : Extension() {
 					)
 				)
 
-				respond { content = "Message sent" }
+				respond { content = Translations.Commands.Reply.sent.translate() }
 			}
 		}
 
 		ephemeralSlashCommand(::ReplyArgs) {
-			name = "anonreply"
-			description = "Reply anonymously to the user this thread channel is owned by"
+			name = Translations.Commands.Reply.Anonreply.name
+			description = Translations.Commands.Reply.Anonreply.name
 
 			guild(MAIL_SERVER)
 
@@ -89,10 +89,10 @@ class ReplyCommands : Extension() {
 					}
 				}
 
-				SentMessageCollection().addMessage(
+				SentMessagesCollection().addMessage(
 					SentMessageData(
 						channel.id,
-						SentMessageCollection().getNextMessageNumber(channel.id),
+						SentMessagesCollection().getNextMessageNumber(channel.id),
 						dmChannelMessage.id,
 						threadMessageId.id,
 						wasSentByStaff = true,
@@ -100,15 +100,15 @@ class ReplyCommands : Extension() {
 					)
 				)
 
-				respond { content = "Message sent" }
+				respond { content = Translations.Commands.Reply.sent.translate() }
 			}
 		}
 	}
 
 	inner class ReplyArgs : Arguments() {
 		val content by string {
-			name = "message"
-			description = "What you'd like to reply with"
+			name = Translations.Commands.Reply.Reply.Args.Content.name
+			description = Translations.Commands.Reply.Reply.Args.Content.description
 
 			mutate {
 				it.replace("\\n", "\n").replace("\n", "\n")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -7,14 +7,15 @@
  * please see the LICENSE file or https://mit-license.org/
  */
 
+@file:Suppress("MemberNameEqualsClassName")
+
 package io.github.nocomment1105.modmailbot.database
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
+import com.mongodb.kotlin.client.coroutine.MongoClient
 import io.github.nocomment1105.modmailbot.MONGO_URI
 import org.bson.UuidRepresentation
-import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.reactivestreams.KMongo
 
 class Database {
 	/** The settings to connect to the database with. */
@@ -24,7 +25,7 @@ class Database {
 		.applyConnectionString(ConnectionString(MONGO_URI))
 		.build()
 
-	private val client = KMongo.createClient(settings).coroutine
+	private val client = MongoClient.create(settings)
 
 	/** The database. */
 	val database get() = client.getDatabase("modmail")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -9,21 +9,23 @@
 
 package io.github.nocomment1105.modmailbot.database.collections
 
-import com.kotlindiscord.kord.extensions.koin.KordExKoinComponent
 import dev.kord.common.entity.Snowflake
+import dev.kordex.core.koin.KordExKoinComponent
 import io.github.nocomment1105.modmailbot.database.Database
+import io.github.nocomment1105.modmailbot.database.DatabaseUtils.eq
+import io.github.nocomment1105.modmailbot.database.DatabaseUtils.findOne
 import io.github.nocomment1105.modmailbot.database.entities.OpenThreadData
+import kotlinx.coroutines.flow.first
 import org.koin.core.component.inject
-import org.litote.kmongo.eq
 
 /**
  * This class stores the functions for interacting with the open thread database.
  */
-class OpenThreadCollection : KordExKoinComponent {
+class OpenThreadsCollection : KordExKoinComponent {
 	private val db: Database by inject()
 
 	@PublishedApi
-	internal val collection = db.database.getCollection<OpenThreadData>()
+	internal val collection = db.database.getCollection<OpenThreadData>(name)
 
 	/**
 	 * Adds a thread to the database.
@@ -40,7 +42,7 @@ class OpenThreadCollection : KordExKoinComponent {
 	 * @author NoComment1105
 	 * @since 1.0.0
 	 */
-	suspend fun removeByUser(userId: Snowflake) = collection.deleteOne(OpenThreadData::userId eq userId)
+	suspend fun removeByUser(userId: Snowflake) = collection.deleteOne(eq(OpenThreadData::userId, userId))
 
 	/**
 	 * Removes a thread from the database.
@@ -49,7 +51,7 @@ class OpenThreadCollection : KordExKoinComponent {
 	 * @author NoComment1105
 	 * @since 1.0.0
 	 */
-	suspend fun removeByThread(threadId: Snowflake) = collection.deleteOne(OpenThreadData::threadId eq threadId)
+	suspend fun removeByThread(threadId: Snowflake) = collection.deleteOne(eq(OpenThreadData::threadId, threadId))
 
 	/**
 	 * Gets the open thread for the user. There should only ever be one at a time, hence we return the [first] element
@@ -60,7 +62,7 @@ class OpenThreadCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend fun getOpenThreadsForUser(userId: Snowflake): OpenThreadData? =
-		collection.find(OpenThreadData::userId eq userId).first()
+		collection.find(eq(OpenThreadData::userId, userId)).first()
 
 	/**
 	 * Gets the DM id from the [threadId].
@@ -71,5 +73,7 @@ class OpenThreadCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend fun getDmFromThreadChannel(threadId: Snowflake): Snowflake? =
-		collection.findOne(OpenThreadData::threadId eq threadId)?.userId
+		collection.findOne(eq(OpenThreadData::threadId, threadId))?.userId
+
+	companion object : CollectionBase("open-threads")
 }

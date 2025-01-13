@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 NoComment1105 <nocomment1105@outlook.com>
+ * Copyright (c) 2022-2025 NoComment1105 <nocomment1105@outlook.com>
  *
  * This file is part of ModMail.
  *
@@ -9,21 +9,24 @@
 
 package io.github.nocomment1105.modmailbot.database.collections
 
-import com.kotlindiscord.kord.extensions.koin.KordExKoinComponent
+import com.mongodb.client.model.Filters.and
 import dev.kord.common.entity.Snowflake
+import dev.kordex.core.koin.KordExKoinComponent
 import io.github.nocomment1105.modmailbot.database.Database
+import io.github.nocomment1105.modmailbot.database.DatabaseUtils.eq
+import io.github.nocomment1105.modmailbot.database.DatabaseUtils.findOne
 import io.github.nocomment1105.modmailbot.database.entities.SentMessageData
+import kotlinx.coroutines.flow.toList
 import org.koin.core.component.inject
-import org.litote.kmongo.eq
 
 /**
  * The class for interacting with the SentMessageData database.
  */
-class SentMessageCollection : KordExKoinComponent {
+class SentMessagesCollection : KordExKoinComponent {
 	private val db: Database by inject()
 
 	@PublishedApi
-	internal val collection = db.database.getCollection<SentMessageData>()
+	internal val collection = db.database.getCollection<SentMessageData>(name)
 
 	/**
 	 * Adds a message to the database.
@@ -45,7 +48,7 @@ class SentMessageCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend inline fun getMessagesInThread(threadId: Snowflake): List<SentMessageData?> =
-		collection.find(SentMessageData::threadId eq threadId).toList()
+		collection.find(eq(SentMessageData::threadId, threadId)).toList()
 
 	/**
 	 * Gets every message internal sent in a thread.
@@ -56,7 +59,8 @@ class SentMessageCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend inline fun getInternalSentMessages(threadId: Snowflake): List<SentMessageData?> =
-		collection.find(SentMessageData::threadId eq threadId, SentMessageData::wasSentByStaff eq true).toList()
+		collection.find(and(eq(SentMessageData::threadId, threadId), eq(SentMessageData::wasSentByStaff, true)))
+			.toList()
 
 	/**
 	 * Gets every message sent by an external user in a thread.
@@ -67,7 +71,8 @@ class SentMessageCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend inline fun getUserSentMessages(threadId: Snowflake): List<SentMessageData?> =
-		collection.find(SentMessageData::threadId eq threadId, SentMessageData::wasSentByStaff eq false).toList()
+		collection.find(and(eq(SentMessageData::threadId, threadId), eq(SentMessageData::wasSentByStaff, false)))
+			.toList()
 
 	/**
 	 * Gets a message sent by in a thread by its number identifier.
@@ -79,7 +84,7 @@ class SentMessageCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend inline fun getMessageByNumber(threadId: Snowflake, number: Int): SentMessageData? =
-		collection.findOne(SentMessageData::threadId eq threadId, SentMessageData::messageNumber eq number)
+		collection.findOne(and(eq(SentMessageData::threadId, threadId), eq(SentMessageData::messageNumber, number)))
 
 	/**
 	 * Gets a DM message by the ID of its linked thread message. Primarily for use when going from thread message to dm
@@ -92,7 +97,12 @@ class SentMessageCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend inline fun getDmMessageById(threadId: Snowflake, messageId: Snowflake): Snowflake? =
-		collection.findOne(SentMessageData::threadId eq threadId, SentMessageData::threadMessageId eq messageId)?.dmMessageId
+		collection.findOne(
+			and(
+				eq(SentMessageData::threadId, threadId),
+				eq(SentMessageData::threadMessageId, messageId)
+			)
+		)?.dmMessageId
 
 	/**
 	 * Gets a thread message by the ID of its linked DM message. Primarily for use when going from dm message to thread
@@ -105,7 +115,12 @@ class SentMessageCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend inline fun getInternalMessageById(threadId: Snowflake, messageId: Snowflake): Snowflake? =
-		collection.findOne(SentMessageData::threadId eq threadId, SentMessageData::dmMessageId eq messageId)?.threadMessageId
+		collection.findOne(
+			and(
+				eq(SentMessageData::threadId, threadId),
+				eq(SentMessageData::dmMessageId, messageId)
+			)
+		)?.threadMessageId
 
 	/**
 	 * Gets the next number id for sent messages.
@@ -117,7 +132,7 @@ class SentMessageCollection : KordExKoinComponent {
 	 */
 	suspend inline fun getNextMessageNumber(threadId: Snowflake): Int = try {
 		getMessagesInThread(threadId).last()!!.messageNumber + 1
-	} catch (e: NoSuchElementException) {
+	} catch (_: NoSuchElementException) {
 		1
 	}
 
@@ -130,5 +145,7 @@ class SentMessageCollection : KordExKoinComponent {
 	 * @since 1.0.0
 	 */
 	suspend inline fun removeMessages(threadId: Snowflake) =
-		collection.deleteMany(SentMessageData::threadId eq threadId)
+		collection.deleteMany(eq(SentMessageData::threadId, threadId))
+
+	companion object : CollectionBase("sent-messages")
 }
