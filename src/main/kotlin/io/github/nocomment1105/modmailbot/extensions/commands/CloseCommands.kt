@@ -13,6 +13,7 @@ import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.channel.DmChannel
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.checks.anyGuild
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.coalescingOptionalDuration
 import dev.kordex.core.commands.converters.impl.defaultingBoolean
@@ -21,7 +22,6 @@ import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.ephemeralSlashCommand
 import dev.kordex.core.utils.scheduling.Scheduler
 import dev.kordex.core.utils.scheduling.Task
-import io.github.nocomment1105.modmailbot.MAIL_SERVER
 import io.github.nocomment1105.modmailbot.database.collections.CloseQueueCollection
 import io.github.nocomment1105.modmailbot.database.collections.OpenThreadsCollection
 import io.github.nocomment1105.modmailbot.database.collections.SentMessagesCollection
@@ -48,7 +48,10 @@ class CloseCommands : Extension() {
 			name = Translations.Commands.Close.name
 			description = Translations.Commands.Close.description
 
-			guild(MAIL_SERVER)
+			check {
+				// Command is not to be run in DM with bot
+				anyGuild()
+			}
 
 			action {
 				val userToDm = inThreadChannel() ?: return@action

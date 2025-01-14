@@ -9,6 +9,7 @@
 
 package io.github.nocomment1105.modmailbot.extensions.events
 
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.getChannelOf
 import dev.kord.core.entity.channel.GuildMessageChannel
@@ -27,7 +28,6 @@ import dev.kordex.core.extensions.event
 import dev.kordex.core.i18n.toKey
 import dev.kordex.core.i18n.types.Key
 import dev.kordex.modules.dev.unsafe.annotations.UnsafeAPI
-import io.github.nocomment1105.modmailbot.MAIL_SERVER
 import io.github.nocomment1105.modmailbot.database.collections.OpenThreadsCollection
 import io.github.nocomment1105.modmailbot.database.collections.SentMessagesCollection
 import io.github.nocomment1105.modmailbot.editedMessageEmbed
@@ -51,7 +51,8 @@ class MessageEditing : Extension() {
 				val threadMessageIdToEdit =
 					SentMessagesCollection().getInternalMessageById(userThread!!.threadId, event.messageId)!!
 				val threadMessageToEdit =
-					kord.getGuildOrNull(MAIL_SERVER)!!.getChannelOf<GuildMessageChannel>(userThread.threadId)
+					// TODO Add a config system to enable the mail server gotten
+					kord.getGuildOrNull(Snowflake(""))!!.getChannelOf<GuildMessageChannel>(userThread.threadId)
 						.getMessage(threadMessageIdToEdit)
 
 				threadMessageToEdit.edit {
@@ -112,7 +113,8 @@ class MessageEditing : Extension() {
 						messageEmbed(
 							modal?.newContents.toString(),
 							user.asUser(),
-							MAIL_SERVER,
+							// TODO Add a config system to enable the mail server gotten
+							Snowflake(""),
 							DISCORD_GREEN,
 							originalSentMessage?.isAnonymous == true
 						)

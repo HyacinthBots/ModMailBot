@@ -13,32 +13,25 @@ package io.github.nocomment1105.modmailbot
 
 import dev.kord.cache.map.MapLikeCollection
 import dev.kord.cache.map.internal.MapEntryCache
+import dev.kord.cache.map.lruLinkedHashMap
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import dev.kord.rest.builder.message.actionRow
+import dev.kord.rest.builder.message.embed
 import dev.kordex.core.ExtensibleBot
+import dev.kordex.core.i18n.SupportedLocales
+import dev.kordex.data.api.DataCollection
 import io.github.nocomment1105.modmailbot.extensions.commands.CloseCommands
 import io.github.nocomment1105.modmailbot.extensions.commands.ReplyCommands
 import io.github.nocomment1105.modmailbot.extensions.events.MessageEditing
 import io.github.nocomment1105.modmailbot.extensions.events.MessageReceiving
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.FileInputStream
-import java.util.*
-
-val file = FileInputStream("config.properties")
-val config = Properties()
+import modmailbot.i18n.Translations
 
 suspend fun main() {
-	withContext(Dispatchers.IO) {
-		config.load(file)
-	}
-
 	val bot = ExtensibleBot(BOT_TOKEN) {
-		database(false)
+		dataCollectionMode = DataCollection.None
 
-		applicationCommands {
-			defaultGuild(MAIL_SERVER)
-		}
+		database(false)
 
 		extensions {
 			add(::MessageReceiving)
@@ -60,20 +53,80 @@ suspend fun main() {
 		}
 
 		presence {
-			when (config.getProperty("statusType")) {
-				"playing" -> playing(config.getProperty("status"))
-				"watching" -> watching(config.getProperty("status"))
-				else -> watching("for your DMs!")
-			}
+			watching("for your DMs!")
 		}
 
 		kord {
+			stackTraceRecovery = true
+
 			cache {
 				messages { cache, description ->
-					MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+					// Set a max message cache size of 1000 messages to avoid creating a crazy large cache
+					MapEntryCache(cache, description, MapLikeCollection.lruLinkedHashMap(1000))
 				}
 			}
 		}
+
+		about {
+			ephemeral = false
+			general {
+				message { locale ->
+					embed {
+						title = Translations.About.embedTitle.translate()
+
+						// TODO A logo that can go here
+// 						thumbnail {
+// 							url = ""
+// 						}
+
+						description = Translations.About.embedDesc.translate()
+
+						field {
+							name = Translations.About.howSupportTitle.translate()
+							value = Translations.About.howSupportValue.translate()
+						}
+
+						field {
+							name = Translations.About.version.translate()
+							// TODO Install Blossom and do the thing for versions
+							value = ""
+						}
+
+						field {
+							name = Translations.About.usefulLinksName.translate()
+							value = Translations.About.usefulLinksValue.translate()
+						}
+					}
+
+					actionRow {
+						// TODO All of this lmao
+						linkButton("") {
+							label = Translations.About.inviteButton.translate()
+						}
+
+						linkButton("") {
+							label = Translations.About.privacyButton.translate()
+						}
+
+						linkButton("") {
+							label = Translations.About.tosButton.translate()
+						}
+					}
+				}
+			}
+		}
+
+		i18n {
+			interactionUserLocaleResolver()
+			interactionGuildLocaleResolver()
+
+			applicationCommandLocale(SupportedLocales.ENGLISH)
+		}
+
+// TODO Install Doc gen
+// 		docGenerator {
+//
+// 		}
 	}
 
 	bot.start()

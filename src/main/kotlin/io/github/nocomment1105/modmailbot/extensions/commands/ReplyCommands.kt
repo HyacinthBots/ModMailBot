@@ -12,11 +12,11 @@ package io.github.nocomment1105.modmailbot.extensions.commands
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.DISCORD_GREEN
+import dev.kordex.core.checks.anyGuild
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.ephemeralSlashCommand
-import io.github.nocomment1105.modmailbot.MAIL_SERVER
 import io.github.nocomment1105.modmailbot.database.collections.SentMessagesCollection
 import io.github.nocomment1105.modmailbot.database.entities.SentMessageData
 import io.github.nocomment1105.modmailbot.inThreadChannel
@@ -31,7 +31,10 @@ class ReplyCommands : Extension() {
 			name = Translations.Commands.Reply.Reply.name
 			description = Translations.Commands.Reply.Reply.description
 
-			guild(MAIL_SERVER)
+			check {
+				// This is for the mailed to reply with not the mailer
+				anyGuild()
+			}
 
 			action {
 				val userToDm = inThreadChannel() ?: return@action
@@ -69,7 +72,10 @@ class ReplyCommands : Extension() {
 			name = Translations.Commands.Reply.Anonreply.name
 			description = Translations.Commands.Reply.Anonreply.name
 
-			guild(MAIL_SERVER)
+			check {
+				// This is for the mailed to reply with not the mailer
+				anyGuild()
+			}
 
 			action {
 				val userToDm = inThreadChannel() ?: return@action

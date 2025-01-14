@@ -9,6 +9,7 @@
 
 package io.github.nocomment1105.modmailbot.extensions.events
 
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.createTextChannel
 import dev.kord.core.behavior.getChannelOf
@@ -24,8 +25,6 @@ import dev.kordex.core.extensions.event
 import dev.kordex.core.time.TimestampType
 import dev.kordex.core.time.toDiscord
 import dev.kordex.core.utils.createdAt
-import io.github.nocomment1105.modmailbot.MAIL_SERVER
-import io.github.nocomment1105.modmailbot.MAIN_SERVER
 import io.github.nocomment1105.modmailbot.database.collections.OpenThreadsCollection
 import io.github.nocomment1105.modmailbot.database.collections.SentMessagesCollection
 import io.github.nocomment1105.modmailbot.database.entities.OpenThreadData
@@ -56,7 +55,8 @@ class MessageReceiving : Extension() {
 
 				if (!openThread) {
 					// Get the mail channel
-					mailChannel = kord.getGuildOrNull(MAIL_SERVER)!!.createTextChannel(event.message.author!!.tag)
+					// TODO CONFIG
+					mailChannel = kord.getGuildOrNull(Snowflake(""))!!.createTextChannel(event.message.author!!.tag)
 
 					// Store the users thread in the database
 					OpenThreadsCollection().add(
@@ -78,13 +78,15 @@ class MessageReceiving : Extension() {
 
 							field {
 								name = translations.nickname.translate()
-								value = event.message.author!!.asMember(MAIN_SERVER).nickname
+								// TODO CONFIG
+								value = event.message.author!!.asMember(Snowflake("")).nickname
 									?: Translations.Utils.none.translate()
 								inline = true
 							}
 
 							field {
-								val roles = event.message.author!!.asMember(MAIN_SERVER).roles.toList().map { it }
+								// TODO CONFIG
+								val roles = event.message.author!!.asMember(Snowflake("")).roles.toList().map { it }
 								name = translations.roles.translate()
 								value = if (roles.isEmpty()) {
 									Translations.Utils.none.translate()
@@ -130,7 +132,8 @@ class MessageReceiving : Extension() {
 					event.message.addReaction(Emojis.whiteCheckMark)
 				} else {
 					// Get the mail server from the config file
-					mailChannel = kord.getGuildOrNull(MAIL_SERVER)!!.getChannelOf(
+					// TODO MORE CONFIG SYSTEM LMFAO
+					mailChannel = kord.getGuildOrNull(Snowflake(""))!!.getChannelOf(
 						OpenThreadsCollection().getOpenThreadsForUser(event.message.author!!.id)!!.threadId
 					)
 

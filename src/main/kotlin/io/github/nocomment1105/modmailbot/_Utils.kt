@@ -25,6 +25,7 @@ import io.github.nocomment1105.modmailbot.database.collections.MetaCollection
 import io.github.nocomment1105.modmailbot.database.collections.OpenThreadsCollection
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
+import modmailbot.i18n.Translations
 import org.koin.dsl.bind
 
 /**
@@ -72,14 +73,14 @@ suspend fun EmbedBuilder.messageEmbed(
 			name = author.tag
 			icon = author.avatar?.cdnUrl?.toUrl()
 		} else {
-			name = author.asMember(MAIL_SERVER).getTopRole()!!.name
+			name = author.asMemberOrNull(guildId)?.getTopRole()?.name
 		}
 	}
 	description = message
 	timestamp = Clock.System.now()
 	color = embedColor ?: DISCORD_RED
 	footer {
-		text = author.asMember(guildId).getTopRole()!!.name
+		text = author.asMemberOrNull(guildId)?.getTopRole()?.name ?: ""
 	}
 }
 
@@ -101,11 +102,11 @@ fun EmbedBuilder.editedMessageEmbed(
 	embedColor: Color? = null
 ) {
 	field {
-		name = "Previous content"
+		name = Translations.Utils.EditedMessage.previous.translate()
 		value = oldContent
 	}
 	field {
-		name = "New content"
+		name = Translations.Utils.EditedMessage.new.translate()
 		value = newContent
 	}
 	timestamp = Clock.System.now()
