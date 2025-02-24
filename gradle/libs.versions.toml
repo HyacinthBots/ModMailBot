@@ -2,7 +2,7 @@
 # Base
 kotlin = "2.1.0"
 kord-extensions = "2.3.1-20250108.190136-25"
-kord-extensions-plugin = "1.6.1"
+kord-extensions-plugin = "1.6.2"
 kordx-emoji = "0.5.0"
 # ---
 # Logging
